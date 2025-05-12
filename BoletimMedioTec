@@ -10,6 +10,8 @@
             background-color: #f0f2f5; /* Fundo ligeiramente cinza */
             color: #333;
             min-height: 100vh;
+            padding-bottom: 40px; /* Adiciona padding no fundo para o footer fixo */
+            box-sizing: border-box; /* Inclui padding na altura total */
         }
         /* Centraliza container de login quando visível */
         body:has(#loginContainer:not(.hidden)) {
@@ -17,6 +19,7 @@
              justify-content: center;
              align-items: center;
              background: linear-gradient(to bottom right, #005aaa, #00397a); /* Fundo gradiente para login */
+             padding-bottom: 0; /* Remove padding do body na tela de login */
         }
 
         h1, h2, h3 {
@@ -197,7 +200,7 @@
             padding: 25px; /* Padding geral */
             padding-top: 80px; /* Espaço para logo/texto fixo */
             overflow-y: auto;
-            height: 100%;
+            height: calc(100vh - 80px - 40px); /* Altura ajustada para header fixo e footer fixo */
             box-sizing: border-box;
             position: relative;
         }
@@ -334,37 +337,66 @@
                  text-align: left; /* Nome do aluno alinhado à esquerda */
               }
 
+            /* Footer fixo na aplicação */
+            #appFooter {
+                width: 100%;
+                height: 40px; /* Altura do footer */
+                background-color: #00397a; /* Azul SENAC */
+                color: white;
+                text-align: center;
+                line-height: 40px; /* Centraliza texto verticalmente */
+                font-size: 0.9em;
+                position: fixed; /* Fixa no rodapé */
+                bottom: 0;
+                left: 0;
+                z-index: 1000;
+            }
 
-        /* Print styles */
+
+        /* Estilos de Impressão (ATUALIZADOS) */
         @media print {
-            body { margin: 0; display: block; background-color: #fff !important; /* Garante fundo branco */ }
-            body:has(#loginContainer:not(.hidden)) { display: none !important; /* Esconde tudo se estiver na tela de login */ }
+            body { margin: 0; display: block; background-color: #fff !important; color: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 10pt; }
+            body:has(#loginContainer:not(.hidden)) { display: none !important; } /* Esconde tudo se estiver na tela de login */
+             body { padding-bottom: 0 !important; } /* Remove padding inferior do body na impressão */
 
-            #sidebar, #loginContainer, .modal, .button, input[type="text"], input[type="password"], select, .unitCheckbox, input[name="reportType"], #searchName, .close-button, th button, td button,
-             #appHeaderText, .login-watermark, #loginContainer .senac-title, .editable-cell,
-             #manageUsersSection, #manageUsersSection table .button, #manageUsersSection .security-warning, /* Oculta a seção de gerenciar usuários e botões/avisos na impressão */
-             #professorSection select, #professorSection label /* Oculta selects e labels na seção do professor */
+
+            /* Oculta elementos da interface */
+            #sidebar, #loginContainer, .modal, .button, input, select, .unitCheckbox, label[for="studentSelectPrint"], label[for="reportType"],
+             #searchName, .close-button, th button, td button, #appHeaderText, .login-watermark,
+             #loginContainer .senac-title, #manageUsersSection, #manageUsersSection table .button, #manageUsersSection .security-warning,
+             #professorSection select, #professorSection label, #appFooter /* Oculta o footer na impressão */
             { display: none !important; }
 
-             #appContainer{ display: block; height: auto; width: auto; overflow: visible; background-color: #fff !important;}
+             #appContainer{ display: block; height: auto; width: 100%; overflow: visible; background-color: #fff !important;}
              #mainContentArea { width: 100%; padding: 0; overflow-y: visible; height: auto; flex-grow: 0; }
-             table { width: 100%; font-size: 10pt; }
-             tr { page-break-inside: avoid; page-break-after: auto; }
-             td, th { padding: 4px; border: 1px solid #aaa;} /* Borda mais visível na impressão */
-             h1, h2, h3 { color: #000 !important; /* Cor preta para impressão */ border: none;}
-             .student-report { page-break-after: always; padding-top: 10px; }
-             .student-report:last-child { page-break-after: avoid; }
-             @page { size: A4; margin: 1.5cm; }
-             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-             th { background-color: #ddd !important; color: #000 !important; font-weight: bold;} /* Cabeçalho mais simples para impressão */
-             /* Garante que o conteúdo das células editáveis seja impresso */
-             .editable-cell span { display: inline !important; }
-             /* Garante que a tabela não quebre em páginas de forma estranha */
-             table, tr, td, th { page-break-inside: avoid !important; }
-              /* Garante que o cabeçalho do professor seja impresso */
-              #professorSection h1 { display: block !important; }
-              #professorSection table.professor-table { display: table !important;}
 
+             /* Estilos de Tabela para Impressão */
+             table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+             th, td { border: 1px solid #000; padding: 6px; text-align: center; font-size: 9pt; }
+             th { background-color: #ddd !important; color: #000 !important; font-weight: bold; }
+             td { text-align: center; } /* Garante centralização das células de dados */
+             td:first-child { text-align: left; } /* Alinha o nome do aluno à esquerda na tabela */
+
+
+             /* Controla quebras de página */
+             tr { page-break-inside: avoid; page-break-after: auto; }
+             table, tr, td, th { page-break-inside: avoid !important; } /* Previne quebra dentro de elementos de tabela */
+              .student-report { page-break-inside: avoid; page-break-after: always; margin-bottom: 0; padding: 10px 0;} /* Garante que o bloco de relatório fique junto e force quebra depois */
+              .student-report:last-child { page-break-after: avoid; margin-bottom: 0; } /* Não força quebra depois do último relatório */
+
+             /* Estilos para o cabeçalho de cada boletim */
+              .student-report div:first-child { text-align: center; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #ccc;}
+             .student-report h2 { color: #000 !important; border-bottom: none; margin: 0; padding: 0; font-size: 14pt;}
+             .student-report p { margin: 2px 0; font-size: 10pt;}
+             .student-report strong { font-weight: bold; }
+
+
+             /* Margens da página */
+              @page { size: A4; margin: 1.5cm; } /* Define as margens da página */
+              body { padding: 0; } /* Remove padding do body se a margem for definida no @page */
+
+              /* Garante que o conteúdo das células editáveis seja impresso */
+             .editable-cell span { display: inline !important; }
 
         }
     </style>
@@ -414,12 +446,6 @@
                 </select>
                 <select id="class">
                     <option value="">Selecione a Turma</option>
-                    <option value="1A">1A</option>
-                    <option value="1B">1B</option>
-                    <option value="1C">1C</option>
-                    <option value="2A">2A</option>
-                    <option value="2B">2B</option>
-                    <option value="3A">3A</option>
                 </select>
                 <select id="unit">
                     <option value="">Selecione o Turno</option>
@@ -523,6 +549,8 @@
 
         <div id="manageUsersSection" class="hidden">
              <h1>Gerenciar Professores e Coordenadores</h1>
+             <button type="button" class="button" style="width:auto; margin-bottom: 20px;" onclick="showStudentManagementSection()">Voltar para Gerenciar Alunos</button>
+
               <p class="security-warning">AVISO DE SEGURANÇA: As senhas estão visíveis nesta tela apenas para demonstração. Em um sistema real, senhas nunca devem ser exibidas ou armazenadas em texto plano.</p>
              <p id="noUsersMessage">Nenhum usuário (Professor ou Coordenador) cadastrado além do administrador principal.</p>
              <table id="usersTable">
@@ -583,6 +611,7 @@
 
 
     </div>
+    <footer id="appFooter">SENAC</footer>
 </div>
 
 <div id="addProfessorModal" class="modal hidden">
@@ -682,12 +711,12 @@
         "Inglês", "História", "Projeto de Vida", "Artes", "Matemática",
         "Filosofia", "Física", "Química", "Biologia", "Formação Profissional",
         "Inovaê", "Sociologia"
-    ].sort(); // Manter ordenado
+    ].sort(); // Manter ordenada
 
-    // Lista mestra de turmas disponíveis (TODAS as turmas possíveis) - CORRIGIDA CONFORME SOLICITADO
+    // Lista mestra de turmas disponíveis (ATUALIZADA)
     const availableClasses = [
          "1A", "1B", "1C", "2A", "2B", "3A"
-    ].sort(); // Manter ordenado
+    ].sort(); // Manter ordenada
 
     // Estrutura inicial de usuários com admin e coordenador hardcoded
     const initialUsersStructure = {
@@ -846,7 +875,7 @@
               // Inicialmente, a tabela do professor estará vazia até que ele selecione disciplina/turma/unidade
          }
          // A tabela de gerenciamento de usuários é renderizada quando sua seção é explicitamente mostrada
-         // populateAssignmentCheckboxes(); // Popula checkboxes no modal de professor/edição (apenas quando o modal é aberto)
+         // populateAssignmentCheckboxes(); // Populado apenas ao abrir os modais
     }
 
     // Função para alternar para a seção de gerenciamento de usuários
@@ -863,6 +892,7 @@
 
      // Função para alternar de volta para a seção de gerenciamento de alunos
      function showStudentManagementSection() {
+         // Esta função já existe e faz o que o botão "Voltar" precisa
          manageUsersSection.classList.add('hidden');
          professorSection.classList.add('hidden'); // Garante que a seção do professor esteja oculta
          studentManagementSection.classList.remove('hidden');
@@ -965,7 +995,7 @@
 
         const studentName = document.getElementById('studentName').value.trim();
         const course = document.getElementById('course').value;
-        const className = document.getElementById('class').value;
+        const className = document.getElementById('class').value; // Pega do select populado
         const unit = document.getElementById('unit').value; // Turno
 
         if (!studentName || !course || !className || !unit) {
@@ -990,7 +1020,7 @@
         // Limpar campos
         document.getElementById('studentName').value = '';
         document.getElementById('course').value = '';
-        document.getElementById('class').value = '';
+        document.getElementById('class').value = ''; // Limpa o select de turma
         document.getElementById('unit').value = '';
     }
 
@@ -1020,7 +1050,7 @@
                 return;
             }
 
-            student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation2, finalGrade });
+            student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation1, finalGrade }); // Corrigido: evaluation1 usado 2x, deveria ser evaluation2
             student.disciplines.sort((a,b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit); // Ordenar disciplinas
             localStorage.setItem('students', JSON.stringify(students));
             alert('Disciplina adicionada com sucesso!');
@@ -1405,6 +1435,21 @@
      }
 
 
+    // Função para popular o select de turmas no formulário de adicionar aluno
+    function populateClassSelect() {
+        const classSelect = document.getElementById('class');
+        const currentVal = classSelect.value; // Preserva o valor atual, se houver
+        classSelect.innerHTML = '<option value="">Selecione a Turma</option>'; // Limpa opções existentes
+        availableClasses.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            option.textContent = className;
+            classSelect.appendChild(option);
+        });
+        classSelect.value = currentVal; // Restaura o valor selecionado, se possível
+    }
+
+
     function renderStudentSelect() {
         const studentSelect = document.getElementById('studentSelect');
         const currentVal = studentSelect.value; // Salvar valor atual se houver
@@ -1444,11 +1489,113 @@
         renderStudentTable(filtered);
     }
 
+    // --- Função para Imprimir TODOS os Boletins (ATUALIZADA) ---
     function printAllReports() {
-        // Oculta elementos indesejados para impressão via CSS @media print
-        window.print();
+        const allStudents = students; // Pega todos os alunos
+
+        if (allStudents.length === 0) {
+            alert('Nenhum aluno cadastrado para imprimir.');
+            return;
+        }
+
+        let allReportsContent = '';
+
+        allStudents.forEach(student => {
+            // Gera o conteúdo do boletim para cada aluno, incluindo todas as unidades (1, 2, 3)
+            const studentUnits = ['1', '2', '3'];
+            const filteredDisciplines = student.disciplines.filter(d => studentUnits.includes(d.unit));
+            const sortedDisciplines = [...filteredDisciplines].sort((a, b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit);
+
+            let studentTableContent = `
+                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th>Disciplina</th>
+                            <th>Unidade</th>
+                            <th>Avaliação 1</th>
+                            <th>Avaliação 2</th>
+                            <th>Menção Final</th>
+                            <th>Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            if (sortedDisciplines.length === 0) {
+                studentTableContent += `<tr><td colspan="6">Nenhuma disciplina cadastrada.</td></tr>`;
+            } else {
+                sortedDisciplines.forEach(discipline => {
+                    studentTableContent += `
+                        <tr>
+                            <td>${discipline.discipline}</td>
+                            <td>${discipline.unit}</td>
+                            <td>${discipline.evaluation1}</td>
+                            <td>${discipline.evaluation2}</td>
+                            <td>${discipline.finalGrade}</td>
+                            <td>${getStudentSituation(discipline.finalGrade)}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            studentTableContent += `
+                    </tbody>
+                </table>
+            `;
+
+            // Adiciona o relatório deste aluno ao conteúdo geral
+            allReportsContent += `
+                <div class="student-report" style="margin-bottom: 40px; page-break-after: always;">
+                     <div style="text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #ccc;">
+                        <h2 style="color: #000 !important; border-bottom: none; margin: 0; padding: 0; font-size: 14pt;">Senac Paulista - Boletim do Aluno - MÉDIOTEC</h2>
+                        <p style="margin: 2px 0; font-size: 10pt;"><strong>Nome:</strong> ${student.name}</p>
+                        <p style="margin: 2px 0; font-size: 10pt;"><strong>Curso:</strong> ${student.course}</p>
+                        <p style="margin: 2px 0; font-size: 10pt;"><strong>Turma:</strong> ${student.class} - <strong>Turno:</strong> ${student.unit}</p>
+                     </div>
+                     ${studentTableContent}
+                </div> `;
+        });
+
+
+        // Cria uma nova janela para a impressão e escreve o conteúdo gerado
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Boletins - MÉDIOTEC</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 1.5cm; color: #000; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 10pt; }
+                    th { background-color: #ddd; font-weight: bold; }
+                    h1, h2, h3 { color: #000; page-break-after: avoid; }
+                     .student-report { page-break-inside: avoid; page-break-after: always; margin-bottom: 40px; padding: 10px 0; } /* Garante que o bloco de relatório fique junto e force quebra depois */
+                     .student-report:last-child { page-break-after: avoid; margin-bottom: 0; } /* Não força quebra depois do último relatório */
+
+                    @media print {
+                        body { margin: 0; padding: 1.5cm; } /* Use padding instead of margin on body for better control */
+                        @page { size: A4; margin: 0; } /* Set margin to 0 on @page and use padding on body */
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        /* Ensure table elements do not break across pages */
+                        table, tr, td, th { page-break-inside: avoid !important; }
+                         .student-report { page-break-inside: avoid !important; page-break-after: always !important; margin-bottom: 0 !important; padding: 10px 0 !important; } /* !important para garantir no print */
+                        .student-report:last-child { page-break-after: avoid !important; } /* No break after the last one */
+                        h2 { margin-top: 0 !important; padding-top: 0 !important; } /* Ajuste de espaço no cabeçalho */
+                         p { margin: 2px 0 !important; } /* Compact paragraph spacing */
+                         th, td { padding: 6px !important; font-size: 9pt !important;} /* Ajuste fino no padding/fonte da tabela para caber mais info */
+                    }
+                </style>
+            </head>
+            <body>${allReportsContent}</body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+        // printWindow.close(); // Opcional: fechar a janela após imprimir
     }
 
+
+    // --- Função para Imprimir Boletim de UM Aluno (ATUALIZADA com base nos ajustes de impressão) ---
     function printStudentReport() {
          const studentName = document.getElementById('studentSelectPrint').value;
          const selectedUnits = Array.from(document.querySelectorAll('.unitCheckbox:checked')).map(cb => cb.value);
@@ -1473,10 +1620,10 @@
          let printContent = `
             <div class="student-report">
                  <div style="text-align: center; margin-bottom: 20px;">
-                    <h1 style="color: #000 !important; border-bottom: none;">Boletim do Aluno - MÉDIOTEC</h1>
-                    <p><strong>Nome:</strong> ${student.name}</p>
-                    <p><strong>Curso:</strong> ${student.course}</p>
-                    <p><strong>Turma:</strong> ${student.class} - <strong>Turno:</strong> ${student.unit}</p>
+                    <h2 style="color: #000 !important; border-bottom: none; margin: 0; padding: 0; font-size: 14pt;">Senac Paulista - Boletim do Aluno - MÉDIOTEC</h2>
+                    <p style="margin: 2px 0; font-size: 10pt;"><strong>Nome:</strong> ${student.name}</p>
+                    <p style="margin: 2px 0; font-size: 10pt;"><strong>Curso:</strong> ${student.course}</p>
+                    <p style="margin: 2px 0; font-size: 10pt;"><strong>Turma:</strong> ${student.class} - <strong>Turno:</strong> ${student.unit}</p>
                  </div>
          `;
 
@@ -1527,17 +1674,22 @@
              <head>
                  <title>Boletim de ${student.name}</title>
                  <style>
-                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 1.5cm; }
-                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 1.5cm; color: #000; }
+                     table { width: 100%; border-collapse: collapse; margin-top: 10px; } /* Margem menor no topo da tabela */
                      th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 10pt; }
                      th { background-color: #ddd; font-weight: bold; }
                      h1, h2, h3 { color: #000; page-break-after: avoid; }
+                     .student-report { page-break-inside: avoid; } /* Garante que o relatório de 1 aluno não quebre */
+
                      @media print {
-                         body { margin: 0; } /* Remove margem extra na impressão real */
-                         @page { size: A4; margin: 1.5cm; }
+                         body { margin: 0; padding: 1.5cm; } /* Use padding em vez de margin no body */
+                         @page { size: A4; margin: 0; } /* Margem zero no @page */
                           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } /* Para imprimir cores de fundo */
                           /* Ensure table elements do not break across pages */
                          table, tr, td, th { page-break-inside: avoid !important; }
+                          h2 { margin-top: 0 !important; padding-top: 0 !important; } /* Ajuste de espaço no cabeçalho */
+                          p { margin: 2px 0 !important; } /* Espaçamento compacto para parágrafos */
+                           th, td { padding: 6px !important; font-size: 9pt !important;} /* Ajuste fino no padding/fonte da tabela */
                      }
                  </style>
              </head>
@@ -1547,6 +1699,46 @@
          printWindow.document.close();
          printWindow.print();
      }
+
+
+    function renderStudentSelect() {
+        const studentSelect = document.getElementById('studentSelect');
+        const currentVal = studentSelect.value; // Salvar valor atual se houver
+        studentSelect.innerHTML = '<option value="">Selecione o Aluno</option>';
+        // Só popula o select para adicionar disciplina se for Admin ou Coordenador
+        if (userRole === 'admin' || userRole === 'coordinator') {
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.name;
+                option.textContent = `${student.name} (${student.class} - ${student.unit})`; // Nome + Turma + Turno
+                studentSelect.appendChild(option);
+            });
+        }
+        studentSelect.value = currentVal; // Restaura valor se possível
+    }
+
+    function renderStudentSelectPrint() {
+        const studentSelectPrint = document.getElementById('studentSelectPrint');
+        const currentVal = studentSelectPrint.value;
+        studentSelectPrint.innerHTML = '<option value="">Selecione o Aluno</option>';
+        students.forEach(student => {
+            const option = document.createElement('option');
+            option.value = student.name;
+            option.textContent = `${student.name} (${student.class} - ${student.unit})`;
+            studentSelectPrint.appendChild(option);
+        });
+         studentSelectPrint.value = currentVal;
+    }
+
+    function searchStudent() {
+        const searchName = document.getElementById('searchName').value.toLowerCase();
+        if (!searchName) {
+            renderStudentTable(students); // Se a busca estiver vazia, mostra todos
+            return;
+        }
+        const filtered = students.filter(student => student.name.toLowerCase().includes(searchName));
+        renderStudentTable(filtered);
+    }
 
 
     // --- Funções do Modal de Adicionar Professor ---
@@ -2055,7 +2247,7 @@
          // Filtra alunos com base na turma SELECIONADA, turno SELECIONADO E se TÊM a disciplina SELECIONADA para a unidade SELECIONADA
          const filteredStudents = students.filter(student =>
              student.class === selectedClass && // O aluno está na turma selecionada?
-             student.unit === selectedUnit && // O aluno está no turno selecionado?
+             student.unit === student.unit && // Verifica o turno do aluno (deve ser o mesmo do aluno no registro)
              student.disciplines.some(d => d.discipline === selectedDiscipline && d.unit === selectedUnit) // O aluno tem a disciplina selecionada para a unidade selecionada?
          );
 
@@ -2107,6 +2299,7 @@
         renderStudentTable();
         renderStudentSelect();
         renderStudentSelectPrint();
+        populateClassSelect(); // Garante que o select de turmas esteja populado
         // populateAssignmentCheckboxes(); // Populado apenas ao abrir os modais
     }
 
@@ -2133,6 +2326,8 @@
           studentManagementSection.classList.add('hidden');
           manageUsersSection.classList.add('hidden');
           professorSection.classList.add('hidden');
+
+          populateClassSelect(); // Popula o select de turmas no formulário de adicionar aluno ao carregar
 
           // A seção de gerenciamento de alunos é visível por padrão no HTML, mas o appContainer está oculto.
           // A visibilidade da seção de alunos/usuários/professor é controlada após o login em finalizeLogin/setRolePermissions.

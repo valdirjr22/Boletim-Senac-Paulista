@@ -526,7 +526,17 @@
             <button type="button" class="button" onclick="printAllReports()">Imprimir Todos os Boletins</button>
             <button type="button" class="button" onclick="printStudentReport()">Imprimir Boletim do Aluno</button>
 
-            <table id="studentTable">
+             <h3>Backup/Restaurar Dados (Manual)</h3>
+            <button type="button" class="button" onclick="exportData()">Exportar Dados (Backup)</button>
+            <div style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <p style="margin-top: 0; font-weight: bold;">Importar Dados:</p>
+                <input type="file" id="importFile" accept=".json" style="display:none;">
+                <button type="button" class="button" onclick="document.getElementById('importFile').click()" style="width: auto; display: inline-block; margin: 5px 0;">Selecionar Arquivo</button>
+                <span id="importFileName" style="margin-left: 10px; font-style: italic;">Nenhum arquivo selecionado.</span>
+                <button type="button" class="button delete-button" onclick="importData()" disabled id="performImportButton" style="width: auto; display: inline-block; margin: 5px;">Confirmar Importação (Irá substituir dados atuais!)</button>
+                <p id="importStatus" class="error" style="margin-top: 5px;"></p>
+            </div>
+             <table id="studentTable">
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -734,15 +744,15 @@
     // e que o admin e coordenador hardcoded estejam presentes se o localStorage não os tiver.
     // Isso ajuda a evitar problemas se o localStorage estiver vazio ou corrompido de versões anteriores.
     let needsSave = false;
-    if (!users || !users.admin || !Array.isArray(users.coordinators) || !Array.isArray(users.professors)) {
+    if (!users || typeof users.admin !== 'object' || !Array.isArray(users.coordinators) || !Array.isArray(users.professors)) { // Verifica se users.admin é um objeto
          console.log("localStorage 'users' não encontrado ou incompleto. Inicializando com estrutura padrão.");
          users = initialUsersStructure;
          needsSave = true;
     } else {
-        // Verifica se o admin hardcoded está presente
+        // Verifica se o admin hardcoded está presente pelo username
         if (!users.admin || users.admin.username !== initialUsersStructure.admin.username) {
-             console.log("Admin hardcoded não encontrado no localStorage. Adicionando.");
-             users.admin = initialUsersStructure.admin;
+             console.log("Admin hardcoded não encontrado no localStorage. Adicionando/Substituindo.");
+             users.admin = initialUsersStructure.admin; // Garante que o admin é o hardcoded
              needsSave = true;
         }
          // Verifica se o coordenador hardcoded está presente
@@ -1034,7 +1044,7 @@
         const disciplineName = document.getElementById('disciplineSelect').value;
         const unitValue = document.getElementById('unitSelect').value; // Unidade (1, 2, 3)
         const evaluation1 = document.getElementById('evaluation1').value;
-        const evaluation2 = document.getElementById('evaluation2').value;
+        const evaluation2 = document.getElementById('evaluation2').value; // Corrigido para evaluation2
         const finalGrade = document.getElementById('finalGrade').value;
 
         if (!studentName || !disciplineName || !unitValue || !evaluation1 || !evaluation2 || !finalGrade) {
@@ -1050,7 +1060,7 @@
                 return;
             }
 
-            student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation1, finalGrade }); // Corrigido: evaluation1 usado 2x, deveria ser evaluation2
+            student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation2, finalGrade }); // Corrigido: evaluation1 e evaluation2
             student.disciplines.sort((a,b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit); // Ordenar disciplinas
             localStorage.setItem('students', JSON.stringify(students));
             alert('Disciplina adicionada com sucesso!');
@@ -1701,6 +1711,21 @@
      }
 
 
+    // Função para popular o select de turmas no formulário de adicionar aluno
+    function populateClassSelect() {
+        const classSelect = document.getElementById('class');
+        const currentVal = classSelect.value; // Preserva o valor atual, se houver
+        classSelect.innerHTML = '<option value="">Selecione a Turma</option>'; // Limpa opções existentes
+        availableClasses.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            option.textContent = className;
+            classSelect.appendChild(option);
+        });
+        classSelect.value = currentVal; // Restaura o valor selecionado, se possível
+    }
+
+
     function renderStudentSelect() {
         const studentSelect = document.getElementById('studentSelect');
         const currentVal = studentSelect.value; // Salvar valor atual se houver
@@ -1739,6 +1764,133 @@
         const filtered = students.filter(student => student.name.toLowerCase().includes(searchName));
         renderStudentTable(filtered);
     }
+
+    // Function to export data to a JSON file
+    function exportData() {
+        const data = {
+            students: students, // Global students array
+            users: users // Global users object
+        };
+        const jsonData = JSON.stringify(data, null, 2); // Use 2 spaces for indentation
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mediotec_data_backup.json'; // Default file name
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up the object URL
+        alert('Dados exportados com sucesso!');
+    }
+
+    // Function to import data from a JSON file
+    function importData() {
+        const fileInput = document.getElementById('importFile');
+        const importStatus = document.getElementById('importStatus');
+        const performImportButton = document.getElementById('performImportButton');
+        importStatus.textContent = ''; // Clear previous messages
+
+        if (fileInput.files.length === 0) {
+            importStatus.textContent = 'Por favor, selecione um arquivo para importar.';
+            return;
+        }
+
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onload = (event) => {
+            try {
+                const importedData = JSON.parse(event.target.result);
+
+                // Basic validation: Check if the structure looks somewhat correct
+                if (!importedData || !Array.isArray(importedData.students) || !importedData.users || !Array.isArray(importedData.users.coordinators) || !Array.isArray(importedData.users.professors) || typeof importedData.users.admin !== 'object') { // Check for admin object type
+                    throw new Error('Estrutura de dados inválida no arquivo JSON.');
+                }
+
+                // Ask for confirmation before overwriting
+                if (confirm('ATENÇÃO: A importação substituirá a maioria dos dados atuais de Alunos e Usuários (Professores/Coordenadores). O usuário administrador principal será mantido.\nDeseja continuar?')) {
+
+                     // Preserve the hardcoded admin during import
+                     // Ensure we use the initial structure's admin, not whatever might be in the imported file
+                     importedData.users.admin = initialUsersStructure.admin; // Use the original hardcoded admin
+
+
+                     // Merge logic for other users: Keep users from current storage if they are NOT in the imported data
+                     // This prevents losing newly added users (coordinators/professors) if importing an old backup
+                     const importedUsernames = [
+                          importedData.users.admin.username, // Include admin username
+                         ...importedData.users.coordinators.map(u => u.username), // Include imported coordinator usernames
+                         ...importedData.users.professors.map(u => u.username) // Include imported professor usernames
+                     ];
+
+                     // Filter current coordinators, keeping only those whose username is NOT in the imported list
+                     const currentCoordinatorsToKeep = users.coordinators.filter(uc => !importedUsernames.includes(uc.username));
+                      // Filter current professors, keeping only those whose username is NOT in the imported list
+                     const currentProfessorsToKeep = users.professors.filter(up => !importedUsernames.includes(up.username));
+
+                     // Add the kept current users to the imported data structure
+                     importedData.users.coordinators.push(...currentCoordinatorsToKeep);
+                     importedData.users.professors.push(...currentProfessorsToKeep);
+
+
+                    // Replace global data with imported data
+                    students.length = 0; // Clear existing students array
+                    students.push(...importedData.students); // Add imported students
+                    users = importedData.users; // Replace the users object with the potentially merged structure
+
+
+                    // Save to localStorage
+                    localStorage.setItem('students', JSON.stringify(students));
+                    localStorage.setItem('users', JSON.stringify(users));
+
+                    alert('Dados importados com sucesso! O sistema será recarregado para aplicar as mudanças.');
+                    // Reload the page to ensure all parts of the app load data from the new localStorage content
+                    location.reload();
+
+                } else {
+                    importStatus.textContent = 'Importação cancelada.';
+                    // Clear the file input and disable the button after cancel
+                    fileInput.value = '';
+                     document.getElementById('importFileName').textContent = '';
+                     performImportButton.disabled = true;
+                }
+
+            } catch (e) {
+                importStatus.textContent = 'Erro ao ler ou processar o arquivo: ' + e.message;
+                console.error('Erro durante importação:', e);
+                 // Clear the file input and disable the button on error
+                 fileInput.value = '';
+                 document.getElementById('importFileName').textContent = '';
+                 performImportButton.disabled = true;
+            }
+        };
+
+        reader.onerror = () => {
+            importStatus.textContent = 'Erro ao ler o arquivo.';
+             // Clear the file input and disable the button on reader error
+             fileInput.value = '';
+             document.getElementById('importFileName').textContent = '';
+             performImportButton.disabled = true;
+        };
+
+        reader.readAsText(file); // Read the selected file as text
+    }
+
+    // Event listener for file input change to show file name and enable import button
+    document.getElementById('importFile').addEventListener('change', function() {
+        const importFileNameSpan = document.getElementById('importFileName');
+        const performImportButton = document.getElementById('performImportButton');
+        if (this.files.length > 0) {
+            importFileNameSpan.textContent = `Arquivo selecionado: ${this.files[0].name}`;
+            performImportButton.disabled = false; // Enable the import button
+            document.getElementById('importStatus').textContent = ''; // Clear any previous status message
+        } else {
+            importFileNameSpan.textContent = 'Nenhum arquivo selecionado.';
+            performImportButton.disabled = true; // Disable the import button if no file
+             document.getElementById('importStatus').textContent = '';
+        }
+    });
 
 
     // --- Funções do Modal de Adicionar Professor ---
@@ -2247,7 +2399,6 @@
          // Filtra alunos com base na turma SELECIONADA, turno SELECIONADO E se TÊM a disciplina SELECIONADA para a unidade SELECIONADA
          const filteredStudents = students.filter(student =>
              student.class === selectedClass && // O aluno está na turma selecionada?
-             student.unit === student.unit && // Verifica o turno do aluno (deve ser o mesmo do aluno no registro)
              student.disciplines.some(d => d.discipline === selectedDiscipline && d.unit === selectedUnit) // O aluno tem a disciplina selecionada para a unidade selecionada?
          );
 

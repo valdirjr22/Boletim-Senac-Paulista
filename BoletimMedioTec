@@ -1,20 +1,25 @@
-<MÉDIOTEC>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciador de Notas de Boletim</title>
+    <title>Gerenciador de Notas de Boletim - MÉDIOTEC</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fonte mais moderna */
             margin: 0;
-            background-color: #fff;
+            background-color: #f0f2f5; /* Fundo ligeiramente cinza */
             color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             min-height: 100vh;
         }
+        /* Centraliza container de login quando visível */
+        body:has(#loginContainer:not(.hidden)) {
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             background: linear-gradient(to bottom right, #005aaa, #00397a); /* Fundo gradiente para login */
+        }
+
         h1, h2, h3 {
             color: #1a73e8; /* Azul */
         }
@@ -44,169 +49,339 @@
             cursor: pointer;
             margin: 5px;
             border-radius: 5px;
-            display: block; 
-            width: calc(100% - 10px); 
+            display: block;
+            width: calc(100% - 10px);
+            transition: background-color 0.3s ease; /* Transição suave */
         }
         .button:hover {
             background-color: #ff4500; /* Laranja escuro */
         }
+         .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+         .button.delete-button {
+             background-color: #dc3545; /* Vermelho para excluir */
+         }
+          .button.delete-button:hover {
+             background-color: #c82333; /* Vermelho mais escuro */
+          }
         .hidden {
             display: none !important;
         }
         .error {
-            color: red;
+            color: #dc3545; /* Vermelho bootstrap */
             font-size: 14px;
+            margin-top: 10px; /* Espaço acima */
         }
+
+        /* --- Estilos Melhorados Tela de Login --- */
         #loginContainer {
             text-align: center;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+            padding: 40px 35px; /* Mais padding */
+            border: none; /* Remover borda */
+            border-radius: 10px; /* Bordas mais arredondadas */
+            background-color: #ffffff; /* Fundo branco */
+            position: relative;
+            overflow: hidden;
+            width: 400px; /* Container ligeiramente maior */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15); /* Sombra mais pronunciada */
         }
-        input[type="text"], input[type="password"], select {
-            padding: 8px;
-            margin: 5px 0;
-            width: 200px;
+        /* Nome SENAC em destaque */
+        #loginContainer .senac-title {
+            font-size: 3em; /* Tamanho maior */
+            font-weight: bold;
+            color: #ff6600; /* Laranja SENAC */
+            margin-bottom: 30px; /* Mais espaço abaixo */
+            line-height: 1.1;
+        }
+
+        /* Logo Marca D'água Login (Ajustada) */
+        .login-watermark {
+            position: absolute;
+            bottom: 10px; /* Posição inferior */
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0.05; /* Mais sutil */
+            z-index: 0;
+            pointer-events: none;
+            width: 60%; /* Tamanho relativo */
+        }
+        .login-watermark img {
+             max-width: 100%;
+             height: auto;
+        }
+
+        /* Campos de Input Melhorados */
+        #loginContainer input[type="text"],
+        #loginContainer input[type="password"] {
+            padding: 15px; /* Mais padding interno */
+            margin: 15px 0; /* Mais espaço vertical */
+            width: 100%;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc; /* Borda sutil */
             box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transições */
         }
+        #loginContainer input[type="text"]:focus,
+        #loginContainer input[type="password"]:focus {
+            border-color: #ff6600; /* Laranja no foco */
+            box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.2); /* Sombra externa no foco */
+            outline: none; /* Remove outline padrão */
+        }
+
+         /* Botão Entrar Melhorado */
+         #loginContainer #loginButton {
+             width: 100% !important; /* Ocupa largura total */
+             display: block !important;
+             padding: 15px 30px; /* Padding generoso */
+             margin-top: 25px; /* Espaço acima */
+             font-size: 18px; /* Tamanho da fonte */
+             font-weight: bold;
+             background-color: #ff6600; /* Laranja */
+             border: none;
+             border-radius: 5px;
+             color: white;
+             cursor: pointer;
+             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+         }
+         #loginContainer #loginButton:hover {
+             background-color: #ff4500; /* Laranja escuro */
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+         }
+         /* --- Fim Estilos Login --- */
+
 
         #appContainer {
             display: flex;
             width: 100%;
             height: 100vh;
             overflow: hidden;
+            background-color: #fff; /* Fundo branco para app */
         }
 
         #sidebar {
             width: 230px;
-            background-color: #f0f0f0;
+            background-color: #f8f9fa; /* Cor sidebar bootstrap */
             padding: 15px;
             display: flex;
             flex-direction: column;
-            border-right: 1px solid #ccc;
+            border-right: 1px solid #dee2e6; /* Borda bootstrap */
             height: 100%;
             box-sizing: border-box;
+            flex-shrink: 0;
         }
         #sidebar h2, #sidebar h3 {
             margin-top: 10px;
             margin-bottom: 10px;
-            font-size: 1.2em;
+            font-size: 1.1em; /* Tamanho ajustado */
+            color: #495057; /* Cor mais escura */
         }
         #sidebar .button {
             margin-bottom: 10px;
+             text-align: left; /* Alinha texto dos botões */
+             padding: 10px 12px;
+             width: 100%; /* Ocupa toda largura */
+             box-sizing: border-box;
         }
         #sidebar .button.logout-button {
             margin-top: auto;
+            background-color: #6c757d; /* Cinza escuro logout */
         }
+         #sidebar .button.logout-button:hover {
+             background-color: #5a6268;
+         }
 
         #mainContentArea {
             flex-grow: 1;
-            padding: 20px;
+            padding: 25px; /* Padding geral */
+            padding-top: 80px; /* Espaço para logo/texto fixo */
             overflow-y: auto;
             height: 100%;
             box-sizing: border-box;
-        }
-        #mainContentArea h1 {
-            margin-top: 0;
-        }
-
-        /* Modal styles */
-        .modal {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 500px; /* Ajustado para melhor visualização */
-            max-width: 90%; /* Responsividade */
-            max-height: 80vh;
-            overflow-y: auto;
             position: relative;
         }
-        .modal-content h2 {
+        /* Texto App - Canto Superior Direito */
+        #appHeaderText {
+            position: fixed;
+            top: 15px;
+            right: 25px;
+            font-size: 2em; /* Tamanho grande */
+            font-weight: bold;
+            color: #00397a; /* Azul escuro */
+            z-index: 1001;
+        }
+
+
+        #mainContentArea h1 {
             margin-top: 0;
+            margin-bottom: 25px; /* Mais espaço abaixo do título principal */
         }
-        .modal-content label{
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
+
+        /* Ajustes gerais inputs/selects dentro do App */
+        input[type="text"], input[type="password"], select {
+            padding: 10px; /* Aumentar padding */
+            margin: 5px 3px; /* Ajustar margem */
+            width: auto; /* Permitir ajuste automático inicial */
+            min-width: 180px; /* Largura mínima */
+            border-radius: 5px;
+            border: 1px solid #ced4da; /* Borda bootstrap */
+            box-sizing: border-box;
+            font-size: 15px;
         }
-        .modal-content input[type="text"]{
-            width: 100%; /* Ocupa toda a largura do modal content */
+         input[type="text"]:disabled, select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+         }
+        /* Botões inline com inputs */
+        #addStudentSection button, #addDisciplineSection button, #mainContentArea h2 + button, #mainContentArea h3 + button {
+             width: auto !important;
+             display: inline-block !important;
+             vertical-align: middle; /* Alinhar com selects/inputs */
+             margin-left: 10px;
         }
 
 
-        .close-button {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            font-size: 24px;
-            font-weight: bold;
+        /* Modal styles */
+        .modal { position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background-color: white; padding: 20px; border-radius: 8px; width: 500px; max-width: 90%; max-height: 80vh; overflow-y: auto; position: relative; z-index: 1002; }
+        .modal-content h2 { margin-top: 0; }
+        .modal-content label{ display: block; margin-top: 10px; font-weight: bold; }
+        .modal-content input[type="text"], .modal-content input[type="password"] { width: 100%; } /* Inputs no modal 100% */
+        .close-button { position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; cursor: pointer; }
+        #professorDisciplinesCheckboxes div, #professorClassesCheckboxes div, #editProfessorDisciplinesCheckboxes div, #editProfessorClassesCheckboxes div { margin-bottom: 5px; } /* Adicionado IDs de edição */
+        #professorDisciplinesCheckboxes label, #professorClassesCheckboxes label, #editProfessorDisciplinesCheckboxes label, #editProfessorClassesCheckboxes label { margin-left: 5px; font-weight: normal; display: inline-block; margin-right: 10px; } /* Adicionado IDs de edição */
+        #professorDisciplinesCheckboxes input[type="checkbox"], #professorClassesCheckboxes input[type="checkbox"], #editProfessorDisciplinesCheckboxes input[type="checkbox"], #editProfessorClassesCheckboxes input[type="checkbox"] { vertical-align: middle;} /* Adicionado IDs de edição */
+
+        /* Estilo para células editáveis */
+        .editable-cell {
             cursor: pointer;
+            border: 1px dashed #ccc; /* Bordas tracejadas para indicar editável */
         }
+         .editable-cell:hover {
+            background-color: #e9e9e9;
+         }
+         .editable-cell input, .editable-cell select {
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            border: none;
+            background: none;
+            text-align: center;
+            font-size: inherit;
+            font-family: inherit;
+            box-sizing: border-box;
+         }
 
-        #professorDisciplinesCheckboxes div,
-        #professorClassesCheckboxes div {
-            margin-bottom: 5px;
+        /* Estilos para Tabela de Gerenciamento de Usuários */
+        #manageUsersSection table {
+             margin-top: 15px;
+             width: 95%; /* Tabela um pouco maior para caber a senha */
+             margin-left: auto;
+             margin-right: auto;
         }
-        #professorDisciplinesCheckboxes label, /* Label do checkbox */
-        #professorClassesCheckboxes label { /* Label do checkbox */
-            margin-left: 5px;
-            font-weight: normal; /* Reset para label de checkbox */
-            display: inline; /* Para ficar ao lado do checkbox */
-        }
+         #manageUsersSection table th, #manageUsersSection table td {
+             text-align: left;
+              padding: 10px; /* Mais padding */
+         }
+          #manageUsersSection table td:nth-last-child(2) { /* Coluna da Senha (penúltima) */
+             font-family: 'Courier New', Courier, monospace; /* Fonte monoespaçada para senhas */
+             font-size: 0.9em;
+             overflow-wrap: break-word; /* Quebra a senha se for muito longa */
+         }
+          #manageUsersSection table th:nth-last-child(2), #manageUsersSection table td:nth-last-child(2) { /* Centraliza título Senha */
+             text-align: center;
+          }
+           #manageUsersSection table td:last-child { /* Coluna de ações */
+               text-align: center;
+               width: 120px; /* Espaço para botões */
+           }
+           #manageUsersSection table .button {
+               width: auto;
+               display: inline-block;
+               margin: 2px;
+           }
+            #manageUsersSection p { /* Mensagem quando não há usuários */
+                 text-align: center;
+                 font-style: italic;
+                 color: #666;
+            }
+            #manageUsersSection .security-warning {
+                color: #dc3545; /* Vermelho */
+                text-align: center;
+                margin-top: 20px;
+                font-weight: bold;
+            }
+
+            /* Estilos para Seção do Professor */
+             #professorSection h1 {
+                 margin-bottom: 15px;
+             }
+             #professorSection p {
+                 margin-bottom: 15px;
+             }
+              #professorSection label {
+                  font-weight: bold;
+                  margin-right: 5px;
+              }
+              #professorSection select {
+                 margin-right: 15px;
+              }
+              #professorSection table.professor-table th, #professorSection table.professor-table td {
+                  text-align: center; /* Centraliza células da tabela do professor */
+              }
+              #professorSection table.professor-table td:first-child {
+                 text-align: left; /* Nome do aluno alinhado à esquerda */
+              }
 
 
+        /* Print styles */
         @media print {
-            body {
-                margin: 0;
-                display: block;
-            }
-            #sidebar, #loginContainer, .modal, .button, input[type="text"], input[type="password"], select.unitCheckbox, input[name="reportType"], #searchName, .close-button {
-                display: none !important;
-            }
-            #appContainer{
-                display: block;
-                height: auto;
-                width: auto;
-            }
-            #mainContentArea {
-                width: 100%;
-                padding: 0;
-                overflow-y: visible;
-                height: auto;
-            }
-            table {
-                page-break-inside: auto;
-            }
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
+            body { margin: 0; display: block; background-color: #fff !important; /* Garante fundo branco */ }
+            body:has(#loginContainer:not(.hidden)) { display: none !important; /* Esconde tudo se estiver na tela de login */ }
+
+            #sidebar, #loginContainer, .modal, .button, input[type="text"], input[type="password"], select, .unitCheckbox, input[name="reportType"], #searchName, .close-button, th button, td button,
+             #appHeaderText, .login-watermark, #loginContainer .senac-title, .editable-cell,
+             #manageUsersSection, #manageUsersSection table .button, #manageUsersSection .security-warning, /* Oculta a seção de gerenciar usuários e botões/avisos na impressão */
+             #professorSection select, #professorSection label /* Oculta selects e labels na seção do professor */
+            { display: none !important; }
+
+             #appContainer{ display: block; height: auto; width: auto; overflow: visible; background-color: #fff !important;}
+             #mainContentArea { width: 100%; padding: 0; overflow-y: visible; height: auto; flex-grow: 0; }
+             table { width: 100%; font-size: 10pt; }
+             tr { page-break-inside: avoid; page-break-after: auto; }
+             td, th { padding: 4px; border: 1px solid #aaa;} /* Borda mais visível na impressão */
+             h1, h2, h3 { color: #000 !important; /* Cor preta para impressão */ border: none;}
+             .student-report { page-break-after: always; padding-top: 10px; }
+             .student-report:last-child { page-break-after: avoid; }
+             @page { size: A4; margin: 1.5cm; }
+             body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+             th { background-color: #ddd !important; color: #000 !important; font-weight: bold;} /* Cabeçalho mais simples para impressão */
+             /* Garante que o conteúdo das células editáveis seja impresso */
+             .editable-cell span { display: inline !important; }
+             /* Garante que a tabela não quebre em páginas de forma estranha */
+             table, tr, td, th { page-break-inside: avoid !important; }
+              /* Garante que o cabeçalho do professor seja impresso */
+              #professorSection h1 { display: block !important; }
+              #professorSection table.professor-table { display: table !important;}
+
+
         }
     </style>
 </head>
 <body>
 
 <div id="loginContainer">
-    <h2>Login</h2>
+    <div class="login-watermark">
+        <img src="senac_logo.png" alt="">
+    </div>
+
+    <h1 class="senac-title">SENAC</h1>
+
     <input type="text" id="username" placeholder="Usuário">
     <input type="password" id="password" placeholder="Senha">
-    <button type="button" class="button" id="loginButton" style="width: auto; display: inline-block;">Entrar</button>
+    <button type="button" class="button" id="loginButton">Entrar</button>
     <p id="loginError" class="error"></p>
 </div>
 
@@ -216,130 +391,198 @@
         <div id="userManagementSection" class="hidden">
             <h3>Gerenciar Usuários</h3>
             <button type="button" class="button" onclick="showAddProfessorForm()">Adicionar Professor</button>
-            <button type="button" class="button" onclick="showAddCoordenadorForm()">Adicionar Coordenador</button>
+             <button type="button" class="button" onclick="showAddCoordenadorForm()">Adicionar Coordenador</button>
+            <button type="button" class="button" onclick="showManageUsersSection()">Gerenciar Professores/Coordenadores</button>
         </div>
-        <hr>
-        <button type="button" class="button logout-button" onclick="logout()">Sair</button>
+        <hr id="sidebarHr" class="hidden"> <button type="button" class="button logout-button" onclick="logout()">Sair</button>
     </div>
 
     <div id="mainContentArea">
-        <h1>Gerenciador de Notas de Boletim</h1>
+        <div id="appHeaderText">MÉDIOTEC</div>
 
-        <h2>Adicionar Aluno</h2>
-        <input type="text" id="studentName" placeholder="Nome do Aluno">
-        <select id="course">
-            <option value="">Selecione o Curso</option>
-            <option value="Médio Técnico DS">Médio Técnico DS</option>
-            <option value="Formação Profissional">Formação Profissional</option>
-            <option value="Médio Técnico D JOGOS">Médio Técnico D JOGOS</option>
-            <option value="Médio Tecnico Informática">Médio Tecnico Informática</option>
-        </select>
-        <select id="class">
-            <option value="">Selecione a Turma</option>
-            <option value="1A">1A</option>
-            <option value="1B">1B</option>
-            <option value="1C">1C</option>
-            <option value="1D">1D</option>
-            <option value="2A">2A</option>
-            <option value="2B">2B</option>
-            <option value="3A">3A</option>
-        </select>
-        <select id="unit">
-            <option value="">Selecione o Turno</option>
-            <option value="Manhã">Manhã</option>
-            <option value="Tarde">Tarde</option>
-       </select>
-        <button type="button" class="button" onclick="addStudent()" style="width: auto; display: inline-block;">Adicionar Aluno</button>
+        <div id="studentManagementSection">
+            <h1>Gerenciador de Notas de Boletim</h1>
 
-        <h3>Adicionar Disciplina ao Aluno</h3>
-        <select id="studentSelect"></select>
-        <select id="disciplineSelect">
-            <option value="">Selecione a Disciplina</option>
-            <option value="Redação">Redação</option>
-            <option value="Gramática">Gramática</option>
-            <option value="Educação Física">Educação Física</option>
-            <option value="Literatura">Literatura</option>
-            <option value="Geografia">Geografia</option>
-            <option value="Inglês">Inglês</option>
-            <option value="História">História</option>
-            <option value="Projeto de Vida">Projeto de Vida</option>
-            <option value="Artes">Artes</option>
-            <option value="Matemática">Matemática</option>
-            <option value="Filosofia">Filosofia</option>
-            <option value="Física">Física</option>
-            <option value="Química">Química</option>
-            <option value="Biologia">Biologia</option>
-            <option value="Formação Profissional">Formação Profissional</option>
-            <option value="Inovaê">Inovaê</option>
-        </select>
-        <select id="unitSelect"> <option value="">Selecione a Unidade</option>
-            <option value="1">1° Unidade</option>
-            <option value="2">2° Unidade</option>
-            <option value="3">3° Unidade</option>
-        </select>
-        <select id="evaluation1">
-            <option value="">Avaliação 1</option>
-            <option value="A">A</option>
-            <option value="PA">PA</option>
-            <option value="ND">ND</option>
-        </select>
-        <select id="evaluation2">
-            <option value="">Avaliação 2</option>
-            <option value="A">A</option>
-            <option value="PA">PA</option>
-            <option value="ND">ND</option>
-        </select>
-        <select id="finalGrade">
-            <option value="">Menção Final</option>
-            <option value="D">Desenvolveu (D)</option>
-            <option value="ND">Não Desenvolveu (ND)</option>
-        </select>
-        <button type="button" class="button" onclick="addDiscipline()" style="width: auto; display: inline-block;">Adicionar Disciplina</button>
+            <div id="addStudentSection" class="hidden">
+                <h2>Adicionar Aluno</h2>
+                <input type="text" id="studentName" placeholder="Nome do Aluno">
+                <select id="course">
+                    <option value="">Selecione o Curso</option>
+                    <option value="Médio Técnico DS">Médio Técnico DS</option>
+                    <option value="Formação Profissional">Formação Profissional</option>
+                    <option value="Médio Técnico D JOGOS">Médio Técnico D JOGOS</option>
+                    <option value="Médio Tecnico Informática">Médio Tecnico Informática</option>
+                </select>
+                <select id="class">
+                    <option value="">Selecione a Turma</option>
+                    <option value="1A">1A</option>
+                    <option value="1B">1B</option>
+                    <option value="1C">1C</option>
+                    <option value="2A">2A</option>
+                    <option value="2B">2B</option>
+                    <option value="3A">3A</option>
+                </select>
+                <select id="unit">
+                    <option value="">Selecione o Turno</option>
+                    <option value="Manhã">Manhã</option>
+                    <option value="Tarde">Tarde</option>
+               </select>
+                <button type="button" class="button" onclick="addStudent()">Adicionar Aluno</button>
+            </div>
 
-        <h2>Consultar Alunos</h2>
-        <input type="text" id="searchName" placeholder="Pesquisar Aluno">
-        <button type="button" class="button" onclick="searchStudent()" style="width: auto; display: inline-block;">Pesquisar</button>
+            <div id="addDisciplineSection" class="hidden">
+                <h3>Adicionar Disciplina ao Aluno</h3>
+                <select id="studentSelect"></select>
+                <select id="disciplineSelect">
+                    <option value="">Selecione a Disciplina</option>
+                    <option value="Redação">Redação</option>
+                    <option value="Gramática">Gramática</option>
+                    <option value="Educação Física">Educação Física</option>
+                    <option value="Literatura">Literatura</option>
+                    <option value="Geografia">Geografia</option>
+                    <option value="Inglês">Inglês</option>
+                    <option value="História">História</option>
+                    <option value="Projeto de Vida">Projeto de Vida</option>
+                    <option value="Artes">Artes</option>
+                    <option value="Matemática">Matemática</option>
+                    <option value="Filosofia">Filosofia</option>
+                    <option value="Física">Física</option>
+                    <option value="Química">Química</option>
+                    <option value="Biologia">Biologia</option>
+                    <option value="Formação Profissional">Formação Profissional</option>
+                    <option value="Inovaê">Inovaê</option>
+                    <option value="Sociologia">Sociologia</option> </select>
+                <select id="unitSelect"> <option value="">Selecione a Unidade</option>
+                    <option value="1">1° Unidade</option>
+                    <option value="2">2° Unidade</option>
+                    <option value="3">3° Unidade</option>
+                </select>
+                <select id="evaluation1">
+                    <option value="">Avaliação 1</option>
+                    <option value="A">A</option>
+                    <option value="PA">PA</option>
+                    <option value="ND">ND</option>
+                </select>
+                <select id="evaluation2">
+                    <option value="">Avaliação 2</option>
+                    <option value="A">A</option>
+                    <option value="PA">PA</option>
+                    <option value="ND">ND</option>
+                </select>
+                <select id="finalGrade">
+                    <option value="">Menção Final</option>
+                    <option value="D">Desenvolveu (D)</option>
+                    <option value="ND">Não Desenvolveu (ND)</option>
+                </select>
+                <button type="button" class="button" onclick="addDiscipline()">Adicionar Disciplina</button>
+            </div>
 
-        <h3>Imprimir Boletim</h3>
-          <div>
-              <label>Selecione o Aluno:</label>
-              <select id="studentSelectPrint"></select>
-          </div>
-          <div>
-              <label>Selecione as Unidades:</label>
-              <div>
-                  <label><input type="checkbox" class="unitCheckbox" value="1"> Unidade 1</label>
-                  <label><input type="checkbox" class="unitCheckbox" value="2"> Unidade 2</label>
-                  <label><input type="checkbox" class="unitCheckbox" value="3"> Unidade 3</label>
-                  <label><input type="checkbox" class="unitCheckbox" value="4"> Unidade 4</label>
-              </div>
-          </div>
-          <div>
-              <label><input type="radio" name="reportType" value="full" checked> Incluir Avaliações</label>
-              <label><input type="radio" name="reportType" value="summary"> Somente Menção e Situação</label>
-          </div>
-        <button type="button" class="button" onclick="printAllReports()" style="width: auto; display: inline-block;">Imprimir Todos os Boletins</button>
-        <button type="button" class="button" onclick="printStudentReport()" style="width: auto; display: inline-block;">Imprimir Boletim do Aluno</button>
+            <h2>Consultar Alunos</h2>
+            <input type="text" id="searchName" placeholder="Pesquisar Aluno">
+            <button type="button" class="button" onclick="searchStudent()">Pesquisar</button>
 
-        <table id="studentTable">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Curso</th>
-                    <th>Turma</th>
-                    <th>Turno</th>
-                    <th>Disciplina</th>
-                    <th>Unidade</th>
-                    <th>Avaliação 1</th>
-                    <th>Avaliação 2</th>
-                    <th>Menção Final</th>
-                    <th>Situação</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+            <h3>Imprimir Boletim</h3>
+             <div>
+                 <label>Selecione o Aluno:</label>
+                 <select id="studentSelectPrint"></select>
+             </div>
+             <div>
+                 <label>Selecione as Unidades:</label>
+                 <div>
+                     <label><input type="checkbox" class="unitCheckbox" value="1"> Unidade 1</label>
+                     <label><input type="checkbox" class="unitCheckbox" value="2"> Unidade 2</label>
+                     <label><input type="checkbox" class="unitCheckbox" value="3"> Unidade 3</label>
+                 </div>
+             </div>
+             <div>
+                 <label><input type="radio" name="reportType" value="full" checked> Incluir Avaliações</label>
+                 <label><input type="radio" name="reportType" value="summary"> Somente Menção e Situação</label>
+             </div>
+            <button type="button" class="button" onclick="printAllReports()">Imprimir Todos os Boletins</button>
+            <button type="button" class="button" onclick="printStudentReport()">Imprimir Boletim do Aluno</button>
+
+            <table id="studentTable">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Curso</th>
+                        <th>Turma</th>
+                        <th>Turno</th>
+                        <th>Disciplina</th>
+                        <th>Unidade</th>
+                        <th>Avaliação 1</th>
+                        <th>Avaliação 2</th>
+                        <th>Menção Final</th>
+                        <th>Situação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                     </tbody>
+            </table>
+        </div>
+
+        <div id="manageUsersSection" class="hidden">
+             <h1>Gerenciar Professores e Coordenadores</h1>
+              <p class="security-warning">AVISO DE SEGURANÇA: As senhas estão visíveis nesta tela apenas para demonstração. Em um sistema real, senhas nunca devem ser exibidas ou armazenadas em texto plano.</p>
+             <p id="noUsersMessage">Nenhum usuário (Professor ou Coordenador) cadastrado além do administrador principal.</p>
+             <table id="usersTable">
+                 <thead>
+                     <tr>
+                         <th>Nome</th>
+                         <th>Usuário</th>
+                         <th>Papel</th>
+                         <th>Disciplinas Atribuídas</th>
+                         <th>Turmas Atribuídas</th>
+                         <th>Senha</th>
+                         <th>Ações</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                     </tbody>
+             </table>
+        </div>
+
+         <div id="professorSection" class="hidden">
+             <h1 id="professorWelcome"></h1>
+             <p>Selecione a disciplina, turma e unidade para lançar ou editar as notas dos alunos.</p>
+
+             <div>
+                  <label for="professorDisciplineSelect">Disciplina:</label>
+                  <select id="professorDisciplineSelect"></select>
+
+                  <label for="professorClassSelect" style="margin-left: 20px;">Turma:</label>
+                  <select id="professorClassSelect"></select>
+
+                  <label for="professorUnitSelect" style="margin-left: 20px;">Unidade:</label>
+                  <select id="professorUnitSelect">
+                      <option value="">Selecione a Unidade</option>
+                      <option value="1">1° Unidade</option>
+                      <option value="2">2° Unidade</option>
+                      <option value="3">3° Unidade</option>
+                  </select>
+             </div>
+
+             <table id="professorStudentTable" class="professor-table" style="margin-top: 20px;">
+                  <thead>
+                      <tr>
+                           <th>Nome do Aluno</th>
+                           <th>Curso</th>
+                           <th>Turno</th>
+                           <th>Avaliação 1</th>
+                           <th>Avaliação 2</th>
+                           <th>Menção Final</th>
+                           <th>Situação</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                       </tbody>
+             </table>
+             <p id="professorNoStudentsMessage" style="text-align: center; font-style: italic; margin-top: 20px;">Selecione a disciplina, turma e unidade acima para ver os alunos.</p>
+
+        </div>
+
+
     </div>
 </div>
 
@@ -348,114 +591,404 @@
         <span class="close-button" onclick="closeAddProfessorModal()">&times;</span>
         <h2>Adicionar Novo Professor</h2>
         <div>
-            <label for="professorNameInput">Nome do Professor:</label>
-            <input type="text" id="professorNameInput" placeholder="Nome completo">
+            <label for="newProfessorNameInput">Nome Completo:</label>
+            <input type="text" id="newProfessorNameInput" placeholder="Nome completo do professor">
         </div>
-        
-        <h3>Disciplinas Lecionadas:</h3>
+         <div>
+            <label for="newProfessorUsernameInput">Usuário (Login):</label>
+            <input type="text" id="newProfessorUsernameInput" placeholder="Nome de usuário para login">
+        </div>
+         <div>
+            <label for="newProfessorPasswordInput">Senha:</label>
+            <input type="password" id="newProfessorPasswordInput" placeholder="Senha para login">
+        </div>
+
+        <h3>Atribuições:</h3>
+        <label>Disciplinas:</label>
         <div id="professorDisciplinesCheckboxes">
             </div>
 
-        <h3>Turmas Lecionadas:</h3>
+         <label style="margin-top: 15px;">Turmas:</label>
         <div id="professorClassesCheckboxes">
             </div>
-        <button type="button" class="button" onclick="saveProfessor()" style="width: auto; display: inline-block; margin-top:15px;">Salvar Professor</button>
+        <button type="button" class="button" onclick="saveProfessor()" style="width: auto; display: inline-block; margin-top:20px;">Salvar Professor</button>
+    </div>
+</div>
+
+<div id="addCoordinatorModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeAddCoordenadorModal()">&times;</span>
+        <h2>Adicionar Novo Coordenador</h2>
+        <div>
+            <label for="newCoordinatorNameInput">Nome Completo:</label>
+            <input type="text" id="newCoordinatorNameInput" placeholder="Nome completo do coordenador">
+        </div>
+         <div>
+            <label for="newCoordinatorUsernameInput">Usuário (Login):</label>
+            <input type="text" id="newCoordinatorUsernameInput" placeholder="Nome de usuário para login">
+        </div>
+         <div>
+            <label for="newCoordinatorPasswordInput">Senha:</label>
+            <input type="password" id="newCoordinatorPasswordInput" placeholder="Senha para login">
+        </div>
+         <p style="margin-top: 15px; color: #555;">Coordenadores têm acesso total ao sistema, exceto a criação/edição de usuários.</p>
+        <button type="button" class="button" onclick="saveCoordinator()" style="width: auto; display: inline-block; margin-top:20px;">Salvar Coordenador</button>
+    </div>
+</div>
+
+
+<div id="editUserModal" class="modal hidden">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeEditUserModal()">&times;</span>
+        <h2 id="editUserModalTitle">Editar Usuário</h2>
+        <input type="hidden" id="editUserOriginalUsername"> <input type="hidden" id="editUserRole"> <div>
+            <label for="editUserNameInput">Nome Completo:</label>
+            <input type="text" id="editUserNameInput" placeholder="Nome completo">
+        </div>
+         <div>
+            <label for="editUserUsernameInput">Usuário (Login):</label>
+            <input type="text" id="editUserUsernameInput" placeholder="Nome de usuário para login">
+             <small style="display: block; margin-top: 5px; color: #555;">Alterar o usuário pode exigir um novo login.</small>
+        </div>
+         <div>
+            <label for="editUserPasswordInput">Senha:</label>
+            <input type="password" id="editUserPasswordInput" placeholder="Deixe em branco para manter a senha atual">
+             <small style="display: block; margin-top: 5px; color: #555;">Deixe este campo em branco para não alterar a senha.</small>
+        </div>
+
+        <div id="editProfessorAssignments"> <h3>Atribuições:</h3>
+            <label>Disciplinas:</label>
+            <div id="editProfessorDisciplinesCheckboxes">
+                </div>
+
+             <label style="margin-top: 15px;">Turmas:</label>
+            <div id="editProfessorClassesCheckboxes">
+                </div>
+        </div>
+
+        <button type="button" class="button" onclick="saveEditedUser()" style="width: auto; display: inline-block; margin-top:20px;">Salvar Alterações</button>
     </div>
 </div>
 
 
 <script>
+    // --- INÍCIO DO JAVASCRIPT ---
+
+    // Carregar dados do localStorage
     const students = JSON.parse(localStorage.getItem('students')) || [];
-    let teachersData = JSON.parse(localStorage.getItem('teachersData')) || [];
-    let userRole = '';
+
+    // Lista mestra de disciplinas disponíveis
+    const availableDisciplines = [
+        "Redação", "Gramática", "Educação Física", "Literatura", "Geografia",
+        "Inglês", "História", "Projeto de Vida", "Artes", "Matemática",
+        "Filosofia", "Física", "Química", "Biologia", "Formação Profissional",
+        "Inovaê", "Sociologia"
+    ].sort(); // Manter ordenado
+
+    // Lista mestra de turmas disponíveis (TODAS as turmas possíveis) - CORRIGIDA CONFORME SOLICITADO
+    const availableClasses = [
+         "1A", "1B", "1C", "2A", "2B", "3A"
+    ].sort(); // Manter ordenado
+
+    // Estrutura inicial de usuários com admin e coordenador hardcoded
+    const initialUsersStructure = {
+        admin: { username: 'administrador', password: 'admsenac2024', role: 'admin' },
+        coordinators: [
+            { username: 'coordenador', password: 'coord2024', role: 'coordinator' } // Exemplo de coordenador hardcoded
+        ],
+        professors: []
+    };
+
+    let users = JSON.parse(localStorage.getItem('users'));
+
+    // --- Inicialização e Mesclagem de Usuários no localStorage ---
+    // Esta lógica garante que a estrutura básica (admin, coordinators, professors arrays) exista
+    // e que o admin e coordenador hardcoded estejam presentes se o localStorage não os tiver.
+    // Isso ajuda a evitar problemas se o localStorage estiver vazio ou corrompido de versões anteriores.
+    let needsSave = false;
+    if (!users || !users.admin || !Array.isArray(users.coordinators) || !Array.isArray(users.professors)) {
+         console.log("localStorage 'users' não encontrado ou incompleto. Inicializando com estrutura padrão.");
+         users = initialUsersStructure;
+         needsSave = true;
+    } else {
+        // Verifica se o admin hardcoded está presente
+        if (!users.admin || users.admin.username !== initialUsersStructure.admin.username) {
+             console.log("Admin hardcoded não encontrado no localStorage. Adicionando.");
+             users.admin = initialUsersStructure.admin;
+             needsSave = true;
+        }
+         // Verifica se o coordenador hardcoded está presente
+         const coordHardcodedExistsInStorage = users.coordinators.some(c => c.username === initialUsersStructure.coordinators[0].username);
+         if (!coordHardcodedExistsInStorage) {
+              console.log("Coordenador hardcoded não encontrado no localStorage. Adicionando.");
+              users.coordinators.push(...initialUsersStructure.coordinators);
+              needsSave = true;
+         }
+         // Garante que professors é um array
+         if (!Array.isArray(users.professors)) {
+             console.log("'users.professors' não é um array. Inicializando.");
+              users.professors = [];
+              needsSave = true;
+         }
+          // Garante que coordinators é um array
+         if (!Array.isArray(users.coordinators)) {
+             console.log("'users.coordinators' não é um array. Inicializando.");
+              users.coordinators = initialUsersStructure.coordinators; // Usa a lista inicial para garantir o hardcoded
+              needsSave = true;
+         }
+    }
+
+    if (needsSave) {
+         console.log("Salvando estrutura de usuários atualizada no localStorage:", users);
+         localStorage.setItem('users', JSON.stringify(users));
+    }
+     // --- Fim Inicialização e Mesclagem ---
+
+
+    let currentUser = null; // Armazena o objeto do usuário logado
+    let userRole = ''; // 'admin', 'coordinator', or 'professor'
+
+    // Referências para as seções principais do mainContentArea
+    const studentManagementSection = document.getElementById('studentManagementSection');
+    const manageUsersSection = document.getElementById('manageUsersSection');
+    const professorSection = document.getElementById('professorSection'); // Referência para a nova seção do professor
+
 
     document.getElementById('loginButton').addEventListener('click', login);
 
-    function setRolePermissions(isProfessorView) {
-        const formElementsToToggle = [
-            'studentName', 'course', 'class', 'unit', 
-            'studentSelect', 'disciplineSelect', 'unitSelect', 
-            'evaluation1', 'evaluation2', 'finalGrade'
-        ];
+    // Função para determinar a situação do aluno em uma disciplina/unidade
+     function getStudentSituation(finalGrade) {
+         // Trata casos em que a menção final ainda não foi definida ('')
+         if (finalGrade === 'D') return 'Aprovado';
+         if (finalGrade === 'ND') return 'Reprovado';
+         return 'Pendente'; // Ou qualquer outro status para não definido
+     }
 
-        formElementsToToggle.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.disabled = isProfessorView;
-            }
-        });
+     // Função para verificar se um professor tem permissão para editar uma disciplina/turma
+     function canProfessorEdit(professor, discipline, studentClass) {
+         // console.log(`Checking edit permission for ${professor?.username} on discipline "${discipline}" in class "${studentClass}"`); // DEBUG
+         // console.log("Professor disciplines:", professor?.disciplines); // DEBUG
+         // console.log("Professor classes:", professor?.classes); // DEBUG
 
-        const addStudentButton = document.querySelector('button[onclick="addStudent()"]');
-        const addDisciplineButton = document.querySelector('button[onclick="addDiscipline()"]');
+         if (!professor || professor.role !== 'professor' || !Array.isArray(professor.disciplines) || !Array.isArray(professor.classes)) {
+             // console.log("Not a professor or missing assignment arrays."); // DEBUG
+             return false; // Verifica se é professor e se as propriedades de atribuição são arrays
+         }
 
-        if (addStudentButton) addStudentButton.disabled = isProfessorView;
-        if (addDisciplineButton) addDisciplineButton.disabled = isProfessorView;
+         const hasDiscipline = professor.disciplines.includes(discipline);
+         const inAssignedClass = professor.classes.includes(studentClass);
 
-        const userManagementSection = document.getElementById('userManagementSection');
-        if (isProfessorView) {
-            userManagementSection.classList.add('hidden');
-        } else { 
-            userManagementSection.classList.remove('hidden');
+         // console.log(`Has discipline "${discipline}": ${hasDiscipline}`); // DEBUG
+         // console.log(`In assigned class "${studentClass}": ${inAssignedClass}`); // DEBUG
+
+         return hasDiscipline && inAssignedClass;
+     }
+
+
+    function setRolePermissions() {
+        const isAdmin = userRole === 'admin';
+        const isCoordinator = userRole === 'coordinator';
+        const isProfessor = userRole === 'professor';
+
+        // Esconde todas as seções principais inicialmente
+        studentManagementSection.classList.add('hidden');
+        manageUsersSection.classList.add('hidden');
+        professorSection.classList.add('hidden'); // Esconde a seção do professor
+
+
+        // Mostra as seções baseadas no papel
+        if (isAdmin || isCoordinator) {
+            studentManagementSection.classList.remove('hidden');
+            // Define a visibilidade das seções de adicionar aluno/disciplina (visíveis para Admin e Coordenador)
+            const addStudentSection = document.getElementById('addStudentSection');
+            const addDisciplineSection = document.getElementById('addDisciplineSection');
+            addStudentSection.classList.remove('hidden');
+            addDisciplineSection.classList.remove('hidden');
+
+            // Habilita/Desabilita inputs/selects/buttons nas seções de adição (apenas Admin/Coordenador usam)
+            const addStudentInputs = document.querySelectorAll('#addStudentSection input, #addStudentSection select');
+            const addDisciplineInputs = document.querySelectorAll('#addDisciplineSection input, #addDisciplineSection select');
+            addStudentInputs.forEach(el => el.disabled = !(isAdmin || isCoordinator));
+            addDisciplineInputs.forEach(el => el.disabled = !(isAdmin || isCoordinator));
+            const addStudentButton = document.querySelector('#addStudentSection .button');
+            const addDisciplineButton = document.querySelector('#addDisciplineSection .button');
+            if (addStudentButton) addStudentButton.disabled = !(isAdmin || isCoordinator);
+            if (addDisciplineButton) addDisciplineButton.disabled = !(isAdmin || isCoordinator);
+
+
+        } else if (isProfessor) {
+            professorSection.classList.remove('hidden'); // Mostra a seção do professor
+            // Popula os dropdowns do professor com suas atribuições
+            populateProfessorAssignmentDropdowns();
+            // Define a mensagem de boas-vindas
+             document.getElementById('professorWelcome').textContent = `Bem-vindo(a), Professor(a) ${currentUser.name}!`;
+
         }
+
+
+        // Gerenciamento de Usuários (sidebar) - Visível apenas para Admin principal
+        const userManagementSection = document.getElementById('userManagementSection');
+         const sidebarHr = document.getElementById('sidebarHr');
+        if (isAdmin) {
+            userManagementSection.classList.remove('hidden');
+             sidebarHr.classList.remove('hidden');
+        } else {
+            userManagementSection.classList.add('hidden');
+             sidebarHr.classList.add('hidden');
+        }
+
+         // Renderiza tabelas/selects relevantes para a view atual
+         if (isAdmin || isCoordinator) {
+              renderStudentTable(); // Renderiza a tabela principal de alunos
+              renderStudentSelect(); // Atualiza o select de alunos para adicionar disciplinas
+              renderStudentSelectPrint(); // Atualiza o select de alunos para impressão
+         } else if (isProfessor) {
+              // A view do professor lida com sua própria renderização de tabela baseada nos dropdowns
+              // Inicialmente, a tabela do professor estará vazia até que ele selecione disciplina/turma/unidade
+         }
+         // A tabela de gerenciamento de usuários é renderizada quando sua seção é explicitamente mostrada
+         // populateAssignmentCheckboxes(); // Popula checkboxes no modal de professor/edição (apenas quando o modal é aberto)
     }
+
+    // Função para alternar para a seção de gerenciamento de usuários
+     function showManageUsersSection() {
+         if (userRole !== 'admin') {
+             alert('Você não tem permissão para gerenciar usuários.');
+             return;
+         }
+         studentManagementSection.classList.add('hidden');
+         professorSection.classList.add('hidden'); // Garante que a seção do professor esteja oculta
+         manageUsersSection.classList.remove('hidden');
+         renderUsersTable(); // Popula e mostra a tabela de usuários
+     }
+
+     // Função para alternar de volta para a seção de gerenciamento de alunos
+     function showStudentManagementSection() {
+         manageUsersSection.classList.add('hidden');
+         professorSection.classList.add('hidden'); // Garante que a seção do professor esteja oculta
+         studentManagementSection.classList.remove('hidden');
+         renderAll(); // Re-renderiza tudo na seção de alunos
+     }
+
 
     function login() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
         const loginError = document.getElementById('loginError');
 
-        loginError.textContent = ''; 
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value; // Não trim password
 
-        if (username === 'professor' && password === 'professor') {
-            userRole = 'professor';
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.body.style.display = 'block'; 
-            document.getElementById('appContainer').classList.remove('hidden');
-            alert('Bem-vindo, Professor!');
-            setRolePermissions(true); 
-            renderAll();
-        } else if (username === 'administrador' && password === 'admsenac2024') {
+        console.log('Tentando logar com:', { username: username, password: password }); // ADICIONADO PARA DEBUG
+
+        loginError.textContent = ''; // Limpa mensagens de erro
+
+        // Tenta logar como Admin
+        console.log('Verificando admin...'); // ADICIONADO PARA DEBUG
+        if (users.admin && users.admin.username === username && users.admin.password === password) {
+            console.log('Login de admin bem-sucedido'); // ADICIONADO PARA DEBUG
+            currentUser = users.admin;
             userRole = 'admin';
-            document.getElementById('loginContainer').classList.add('hidden');
-            document.body.style.display = 'block'; 
-            document.getElementById('appContainer').classList.remove('hidden');
-            alert('Bem-vindo, Administrador!');
-            setRolePermissions(false);
-            renderAll();
-        } else {
-            loginError.textContent = 'Usuário ou senha incorretos.';
+            finalizeLogin(`Bem-vindo, Administrador(a)!`);
+            return;
         }
+
+        // Tenta logar como Coordenador
+        console.log('Verificando coordenadores...'); // ADICIONADO PARA DEBUG
+         // Iterar sobre o array de coordenadores
+         const foundCoordinator = users.coordinators.find(c => {
+              console.log(`Comparando com coordenador: Usuário="${c.username}", Senha="${c.password}"`); // DEBUG DENTRO DO FIND
+             return c.username === username && c.password === password;
+         });
+
+         console.log('Coordenador encontrado:', foundCoordinator); // ADICIONADO PARA DEBUG
+         if (foundCoordinator) {
+             console.log('Login de coordenador bem-sucedido'); // ADICIONADO PARA DEBUG
+             currentUser = foundCoordinator;
+             userRole = 'coordinator';
+             finalizeLogin(`Bem-vindo, Coordenador(a)!`);
+             return;
+         }
+
+        // Tenta logar como Professor
+        console.log('Verificando professores...'); // ADICIONADO PARA DEBUG
+        // Iterar sobre o array de professores
+        const foundProfessor = users.professors.find(p => {
+             console.log(`Comparando com professor: Usuário="${p.username}", Senha="${p.password}"`); // DEBUG DENTRO DO FIND
+            return p.username === username && p.password === password;
+        });
+
+        console.log('Professor encontrado:', foundProfessor); // ADICIONADO PARA DEBUG
+        if (foundProfessor) {
+            console.log('Login de professor bem-sucedido'); // ADICIONADO PARA DEBUG
+            currentUser = foundProfessor;
+            userRole = 'professor';
+            finalizeLogin(`Bem-vindo, Professor(a) ${foundProfessor.name}!`);
+            return;
+        }
+
+        // Se nenhum login válido
+        console.log('Falha no login: Usuário ou senha incorretos.'); // ADICIONADO PARA DEBUG
+        loginError.textContent = 'Usuário ou senha incorretos.';
+         usernameInput.value = '';
+         passwordInput.value = '';
     }
 
+    function finalizeLogin(welcomeMessage) {
+         document.getElementById('loginContainer').classList.add('hidden');
+         document.getElementById('appContainer').classList.remove('hidden');
+         alert(welcomeMessage);
+         setRolePermissions(); // Configura a interface baseada no papel (agora gerencia qual seção mostrar)
+     }
+
+
     function logout() {
+        currentUser = null;
         userRole = '';
         document.getElementById('appContainer').classList.add('hidden');
         document.getElementById('loginContainer').classList.remove('hidden');
-        document.body.style.display = 'flex'; 
-        document.getElementById('userManagementSection').classList.add('hidden'); 
-        document.getElementById('username').value = ''; 
-        document.getElementById('password').value = ''; 
-        document.getElementById('loginError').textContent = ''; 
+        document.getElementById('userManagementSection').classList.add('hidden'); // Garante que a seção de gerenciar usuários se esconda
+        document.getElementById('sidebarHr').classList.add('hidden'); // Garante que a linha se esconda
+         studentManagementSection.classList.remove('hidden'); // Garante que a seção de alunos volte a existir (embora oculta pelo appContainer)
+         manageUsersSection.classList.add('hidden'); // Garante que a seção de gerenciar usuários se esconda
+         professorSection.classList.add('hidden'); // Garante que a seção do professor se esconda
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('loginError').textContent = '';
         alert('Você deslogou com sucesso.');
     }
 
     function addStudent() {
-        const studentName = document.getElementById('studentName').value;
+        if (!(userRole === 'admin' || userRole === 'coordinator')) {
+            alert('Você não tem permissão para adicionar alunos.');
+            return;
+        }
+
+        const studentName = document.getElementById('studentName').value.trim();
         const course = document.getElementById('course').value;
         const className = document.getElementById('class').value;
-        const unit = document.getElementById('unit').value; 
+        const unit = document.getElementById('unit').value; // Turno
 
         if (!studentName || !course || !className || !unit) {
             alert('Por favor, preencha todos os campos do aluno.');
             return;
         }
 
+        // Verifica se aluno já existe (mesmo nome, curso, turma e turno)
+        const existingStudent = students.find(s => s.name === studentName && s.course === course && s.class === className && s.unit === unit);
+        if (existingStudent) {
+            alert('Este aluno já está cadastrado neste curso, turma e turno.');
+            return;
+        }
+
         const student = { name: studentName, course, class: className, unit, disciplines: [] };
         students.push(student);
+        students.sort((a, b) => a.name.localeCompare(b.name)); // Manter a lista ordenada
         localStorage.setItem('students', JSON.stringify(students));
         alert('Aluno adicionado com sucesso!');
-        renderAll();
+        renderAll(); // Re-renderiza tudo
 
+        // Limpar campos
         document.getElementById('studentName').value = '';
         document.getElementById('course').value = '';
         document.getElementById('class').value = '';
@@ -463,9 +996,14 @@
     }
 
     function addDiscipline() {
+         if (!(userRole === 'admin' || userRole === 'coordinator')) {
+             alert('Você não tem permissão para adicionar disciplinas.');
+             return;
+         }
+
         const studentName = document.getElementById('studentSelect').value;
         const disciplineName = document.getElementById('disciplineSelect').value;
-        const unitValue = document.getElementById('unitSelect').value; 
+        const unitValue = document.getElementById('unitSelect').value; // Unidade (1, 2, 3)
         const evaluation1 = document.getElementById('evaluation1').value;
         const evaluation2 = document.getElementById('evaluation2').value;
         const finalGrade = document.getElementById('finalGrade').value;
@@ -484,10 +1022,15 @@
             }
 
             student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation2, finalGrade });
+            student.disciplines.sort((a,b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit); // Ordenar disciplinas
             localStorage.setItem('students', JSON.stringify(students));
             alert('Disciplina adicionada com sucesso!');
-            renderAll();
+            renderAll(); // Re-renderiza tudo, incluindo a tabela
+        } else {
+             alert('Erro: Aluno selecionado não encontrado.');
         }
+
+        // Limpar campos de disciplina
         document.getElementById('studentSelect').value = '';
         document.getElementById('disciplineSelect').value = '';
         document.getElementById('unitSelect').value = '';
@@ -496,323 +1039,1108 @@
         document.getElementById('finalGrade').value = '';
     }
 
-    function renderStudentTable() {
+    function deleteStudent(studentName) {
+         if (!(userRole === 'admin' || userRole === 'coordinator')) {
+             alert('Você não tem permissão para excluir alunos.');
+             return;
+         }
+        // Use unescape ao comparar com nomes de alunos para garantir que funcione se houver caracteres especiais
+        const studentToDelete = students.find(s => escape(s.name) === studentName);
+
+        if (!studentToDelete) {
+            console.error('Erro ao excluir: Aluno não encontrado (pode haver problema com caracteres especiais).');
+            alert('Erro ao excluir aluno. Nome do aluno não encontrado.');
+            return;
+        }
+
+        if (confirm(`Tem certeza que deseja excluir o aluno ${studentToDelete.name} e todos os seus registros?`)) {
+             const initialLength = students.length;
+            // Encontra o índice exato para remover
+            const indexToDelete = students.findIndex(s => escape(s.name) === studentName);
+            if (indexToDelete !== -1) {
+                 students.splice(indexToDelete, 1);
+                if (students.length < initialLength) {
+                    localStorage.setItem('students', JSON.stringify(students));
+                    alert('Aluno excluído com sucesso.');
+                    renderAll();
+                } else {
+                    alert('Erro interno ao excluir aluno.'); // Caso splice não remova (improvável)
+                }
+            } else {
+                 alert('Erro ao excluir aluno. Aluno não encontrado.'); // Caso o findIndex falhe (improvável após a primeira checagem)
+            }
+        }
+    }
+
+    function deleteDiscipline(studentName, disciplineName, unitValue) {
+         if (!(userRole === 'admin' || userRole === 'coordinator')) {
+             alert('Você não tem permissão para excluir disciplinas.');
+             return;
+         }
+
+        // Use unescape para obter os valores reais para a busca
+        const realStudentName = unescape(studentName);
+        const realDisciplineName = unescape(disciplineName);
+
+        const student = students.find(s => s.name === realStudentName);
+        if (student) {
+            const initialLength = student.disciplines.length;
+             // Encontra o índice exato da disciplina
+            const indexToDelete = student.disciplines.findIndex(d => d.discipline === realDisciplineName && d.unit === unitValue);
+
+            if (indexToDelete !== -1) {
+                 student.disciplines.splice(indexToDelete, 1);
+                if (student.disciplines.length < initialLength) {
+                    localStorage.setItem('students', JSON.stringify(students));
+                    alert('Disciplina excluída com sucesso.');
+                    renderAll();
+                } else {
+                     alert('Erro interno ao excluir disciplina.'); // Caso splice não remova
+                }
+            } else {
+                 alert('Erro ao excluir disciplina. Disciplina não encontrada para este aluno.'); // Caso findIndex falhe
+            }
+        } else {
+             alert('Erro ao excluir disciplina. Aluno não encontrado.');
+        }
+    }
+
+    // Função para renderizar a tabela de alunos com permissões condicionais
+    function renderStudentTable(filteredStudents = students) {
         const studentTableBody = document.getElementById('studentTable').querySelector('tbody');
         studentTableBody.innerHTML = '';
-        const isAdminView = userRole === 'admin';
 
-        students.forEach(student => {
+        const isAdminOrCoordinator = userRole === 'admin' || userRole === 'coordinator';
+        const isProfessor = userRole === 'professor';
+        const loggedInProfessor = isProfessor ? currentUser : null; // Pega o objeto do professor logado
+
+        filteredStudents.forEach(student => {
             const hasDisciplines = student.disciplines.length > 0;
 
             if (!hasDisciplines) {
+                 // Linha para aluno sem disciplinas (visível para todos, ações apenas para admin/coord)
                 const row = document.createElement('tr');
+                // Use escape nos nomes para o onclick funcionar corretamente
                 row.innerHTML = `
                     <td>${student.name}</td>
                     <td>${student.course}</td>
                     <td>${student.class}</td>
                     <td>${student.unit}</td>
                     <td colspan="6">Sem disciplinas cadastradas</td>
-                    <td>${isAdminView ? `<button type="button" class="button" style="width:auto; display:inline-block; margin-bottom:3px;" onclick="deleteStudent('${student.name}')">Excluir Aluno</button>` : 'N/A'}</td>
+                    <td>${isAdminOrCoordinator ? `<button type="button" class="button" style="width:auto; display:inline-block; margin-bottom:3px;" onclick="deleteStudent('${escape(student.name)}')">Excluir Aluno</button>` : 'N/A'}</td>
                 `;
                 studentTableBody.appendChild(row);
             } else {
-                student.disciplines.forEach((discipline, index) => {
-                    const row = document.createElement('tr');
-                    let actionsHtml = '';
-                     if(isAdminView){
-                        actionsHtml = `<button type="button" class="button" style="width:auto; display:inline-block; margin-bottom:3px;" onclick="deleteDiscipline('${student.name}', '${discipline.discipline}', '${discipline.unit}')">Excluir Disciplina</button>`;
-                        if(index === 0){ 
-                            actionsHtml = `<button type="button" class="button" style="width:auto; display:inline-block; margin-bottom:3px;" onclick="deleteStudent('${student.name}')">Excluir Aluno</button><br>` + actionsHtml;
-                        }
-                     } else {
-                        actionsHtml = 'N/A';
-                     }
+                 // Ordenar disciplinas antes de renderizar
+                 const sortedDisciplines = [...student.disciplines].sort((a, b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit);
 
-                     if (index === 0) {
+                 sortedDisciplines.forEach((discipline, index) => {
+                     const row = document.createElement('tr');
+
+                     // Ações de exclusão (apenas para admin/coordenador)
+                     let actionsHtml = '';
+                     if (isAdminOrCoordinator) {
+                          actionsHtml = `<button type="button" class="button" style="width:auto; display:inline-block; margin-bottom:3px;" onclick="deleteDiscipline('${escape(student.name)}', '${escape(discipline.discipline)}', '${discipline.unit}')">Excluir Disciplina</button>`;
+                         // Botão de excluir aluno só aparece na primeira linha de disciplina do aluno
+                         if (index === 0) {
+                              actionsHtml = `<button type="button" class="button" style="width:auto; display:inline-block; margin-bottom:3px;" onclick="deleteStudent('${escape(student.name)}')">Excluir Aluno</button><br>` + actionsHtml;
+                          }
+                      } else { // Professor ou outro papel sem permissão de exclusão
+                          actionsHtml = 'N/A';
+                      }
+
+                     // Verifica se o professor logado pode editar esta disciplina/turma
+                     const canEditGrades = isProfessor && canProfessorEdit(loggedInProfessor, discipline.discipline, student.class);
+
+                     // Células editáveis para notas/menção se a permissão for concedida
+                     // Use escape nos valores de data-* para segurança
+                     const evaluation1Cell = canEditGrades ?
+                         `<td class="editable-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="evaluation1"><span>${discipline.evaluation1}</span></td>` :
+                         `<td>${discipline.evaluation1}</td>`;
+
+                     const evaluation2Cell = canEditGrades ?
+                         `<td class="editable-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="evaluation2"><span>${discipline.evaluation2}</span></td>` :
+                         `<td>${discipline.evaluation2}</td>`;
+
+                     const finalGradeCell = canEditGrades ?
+                         `<td class="editable-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="finalGrade"><span>${discipline.finalGrade}</span></td>` :
+                         `<td>${discipline.finalGrade}</td>`;
+
+
+                     // Células comuns a todas as linhas de disciplina
+                     const disciplineCells = `
+                         <td>${discipline.discipline}</td>
+                         <td>${discipline.unit}</td>
+                         ${evaluation1Cell}
+                         ${evaluation2Cell}
+                         ${finalGradeCell}
+                         <td>${getStudentSituation(discipline.finalGrade)}</td>
+                     `;
+
+                     if (index === 0) { // Primeira linha da disciplina para este aluno
                          row.innerHTML = `
-                            <td rowspan="${student.disciplines.length}">${student.name}</td>
-                            <td rowspan="${student.disciplines.length}">${student.course}</td>
-                            <td rowspan="${student.disciplines.length}">${student.class}</td>
-                            <td rowspan="${student.disciplines.length}">${student.unit}</td>
-                            <td>${discipline.discipline}</td>
-                            <td>${discipline.unit}</td>
-                            <td>${discipline.evaluation1}</td>
-                            <td>${discipline.evaluation2}</td>
-                            <td>${discipline.finalGrade}</td>
-                            <td>${discipline.finalGrade === 'D' ? 'Aprovado' : 'Reprovado'}</td>
-                            <td rowspan="${student.disciplines.length}">${actionsHtml}</td>`; // Ações com rowspan
-                     } else {
-                         row.innerHTML = `
-                            <td>${discipline.discipline}</td>
-                            <td>${discipline.unit}</td>
-                            <td>${discipline.evaluation1}</td>
-                            <td>${discipline.evaluation2}</td>
-                            <td>${discipline.finalGrade}</td>
-                            <td>${discipline.finalGrade === 'D' ? 'Aprovado' : 'Reprovado'}</td>
-                            `; // Demais linhas de disciplina não repetem a célula de ações devido ao rowspan
+                             <td rowspan="${sortedDisciplines.length}">${student.name}</td>
+                             <td rowspan="${sortedDisciplines.length}">${student.course}</td>
+                             <td rowspan="${sortedDisciplines.length}">${student.class}</td>
+                             <td rowspan="${sortedDisciplines.length}">${student.unit}</td>
+                             ${disciplineCells}
+                             <td rowspan="${sortedDisciplines.length}">${actionsHtml}</td>`;
+                     } else { // Linhas subsequentes de disciplinas (apenas as células da disciplina e notas)
+                         row.innerHTML = disciplineCells;
+                         // Não adiciona as células de dados do aluno ou ação novamente devido ao rowspan
                      }
-                    studentTableBody.appendChild(row);
-                });
+                     studentTableBody.appendChild(row);
+                 });
             }
         });
+         attachInlineEditingEvents(); // Adiciona listeners para edição inline
     }
+
+    // Função para adicionar eventos de edição inline nas células
+     function attachInlineEditingEvents() {
+         // Remove listeners anteriores para evitar duplicação em todas as células editáveis
+         document.querySelectorAll('.editable-cell').forEach(cell => {
+             const oldSpan = cell.querySelector('span');
+             if (oldSpan) {
+                 oldSpan.removeEventListener('click', handleClickEditableCell);
+             }
+             const oldInput = cell.querySelector('input, select');
+             if (oldInput) {
+                  oldInput.removeEventListener('blur', handleBlurEditableCell);
+                  oldInput.removeEventListener('change', handleChangeEditableCell);
+                  oldInput.removeEventListener('keydown', handleKeydownEditableCell);
+                  // Remove o input/select se ele ainda estiver lá (limpeza)
+                   if (cell.contains(oldInput)) {
+                        cell.innerHTML = `<span>${oldInput.tagName === 'SELECT' ? oldInput.options[oldInput.selectedIndex].textContent : oldInput.value}</span>`;
+                   }
+             }
+         });
+
+         // Adiciona listeners aos elementos span *atuais* dentro das células editáveis
+         document.querySelectorAll('.editable-cell span').forEach(span => {
+             // Adiciona o listener diretamente ao span para capturar o clique com mais precisão
+             span.addEventListener('click', handleClickEditableCell);
+         });
+     }
+
+
+    // Handler para clique na célula editável
+     function handleClickEditableCell(event) {
+         const span = event.target; // O elemento span clicado
+         const cell = span.parentElement; // O td pai (.editable-cell)
+
+         const studentName = unescape(cell.dataset.student);
+         const disciplineName = unescape(cell.dataset.discipline);
+         const unitValue = cell.dataset.unit;
+         const field = cell.dataset.field; // evaluation1, evaluation2, or finalGrade
+         const currentValue = span.textContent; // Pega o valor atual do span
+
+         // Verifica se o usuário logado tem permissão para editar esta célula
+         // Seção do Professor: Assume que o professor pode editar as células na SUA tabela
+         // Seção Admin/Coordenador: Assume que apenas professores atribuídos podem editar (já filtrado na renderização da tabela principal)
+         const isProfessorTable = cell.closest('table')?.classList.contains('professor-table');
+         let canEdit = false;
+         if (isProfessorTable) {
+              // Na tabela do professor, ele só vê o que pode editar
+              canEdit = true; // Assume que se está na tabela dele, ele pode editar
+         } else {
+              // Na tabela principal, a célula só tem a classe editable-cell se o professor logado puder editar
+              // Então, se a classe existe, assume que pode editar. (Lógica já aplicada em renderStudentTable)
+              canEdit = cell.classList.contains('editable-cell');
+         }
+
+         if (!canEdit) {
+              console.log("Usuário sem permissão para editar esta célula."); // DEBUG
+              return; // Não permite edição se o usuário não tem permissão
+         }
+
+
+         // Evita editar se já está em modo de edição (procura input ou select dentro da célula)
+         if (cell.querySelector('input, select')) {
+             return;
+         }
+
+         // Encontra o aluno e a disciplina correspondente
+         const student = students.find(s => s.name === studentName);
+         const disciplineEntry = student ? student.disciplines.find(d => d.discipline === disciplineName && d.unit === unitValue) : null;
+
+         if (!disciplineEntry) {
+             console.error('Dados do aluno ou disciplina não encontrados para edição.');
+             return;
+         }
+
+         let inputElement;
+         if (field === 'evaluation1' || field === 'evaluation2') {
+             // Para Avaliação 1 e 2, usa um select com as opções A, PA, ND
+             inputElement = document.createElement('select');
+             ['', 'A', 'PA', 'ND'].forEach(optionValue => { // Adiciona opção vazia
+                 const option = document.createElement('option');
+                 option.value = optionValue;
+                 option.textContent = optionValue;
+                 if (currentValue.trim() === optionValue) { // Trim para comparação segura
+                     option.selected = true;
+                 }
+                 inputElement.appendChild(option);
+             });
+         } else if (field === 'finalGrade') {
+             // Para Menção Final, usa um select com as opções D, ND
+             inputElement = document.createElement('select');
+              // Limpa o select antes de adicionar as opções
+             inputElement.innerHTML = '';
+             ['', 'D', 'ND'].forEach(optionValue => { // Adiciona opção vazia
+                 const option = document.createElement('option');
+                 option.value = optionValue;
+                 // Mostra o texto completo no select, mas salva apenas a sigla
+                 option.textContent = optionValue === '' ? '' : (optionValue === 'D' ? 'Desenvolveu (D)' : 'Não Desenvolveu (ND)');
+                  // Seleciona a opção correta comparando com o valor salvo (D ou ND)
+                  if (currentValue.trim() === optionValue || currentValue.includes(`(${optionValue})`)) {
+                     option.selected = true;
+                  }
+
+                 inputElement.appendChild(option);
+             });
+         }
+
+         if (inputElement) {
+              // Remove o conteúdo atual (span)
+              cell.innerHTML = '';
+             cell.appendChild(inputElement);
+             inputElement.focus(); // Coloca o foco no input/select
+
+             // Adiciona listeners para salvar a mudança
+             inputElement.addEventListener('blur', handleBlurEditableCell);
+             inputElement.addEventListener('change', handleChangeEditableCell); // Captura a mudança para selects
+             inputElement.addEventListener('keydown', handleKeydownEditableCell); // Para salvar com Enter
+         }
+     }
+
+    // Handler para salvar a mudança ao perder o foco (ou selecionar para selects)
+     function handleBlurEditableCell(event) {
+         const inputElement = event.target;
+         const cell = inputElement.parentElement;
+         const studentName = unescape(cell.dataset.student);
+         const disciplineName = unescape(cell.dataset.discipline);
+         const unitValue = cell.dataset.unit;
+         const field = cell.dataset.field;
+         const newValue = inputElement.value; // O valor selecionado (D ou ND, A, PA, ND, ou vazio '')
+
+         // Evita salvar se o input/select já foi removido por outro evento (como Enter)
+         if (!cell.contains(inputElement)) {
+              return; // Já foi tratado
+         }
+
+         const isProfessorTable = cell.closest('table')?.classList.contains('professor-table'); // Check if in professor's table
+
+
+         // Encontra o aluno e a disciplina correspondente
+         const student = students.find(s => s.name === studentName);
+         const disciplineEntry = student ? student.disciplines.find(d => d.discipline === disciplineName && d.unit === unitValue) : null;
+
+         if (disciplineEntry) {
+             // Salva o valor no objeto student
+             disciplineEntry[field] = newValue;
+
+             // Salva no localStorage
+             localStorage.setItem('students', JSON.stringify(students));
+
+             // Recalcula a situação se a menção final for alterada
+             if (field === 'finalGrade') {
+                 if (isProfessorTable) {
+                     // If in the professor's table, just update the situation cell in this row
+                     const row = cell.closest('tr');
+                     if(row) {
+                          // The situation cell is the one after the final grade cell in the professor table structure
+                          const situationCell = cell.nextElementSibling;
+                          if (situationCell) {
+                             situationCell.textContent = getStudentSituation(newValue);
+                          }
+                     }
+                 } else {
+                     // If in the main table, re-render the whole table
+                     renderStudentTable();
+                     // Note: renderStudentTable() calls attachInlineEditingEvents()
+                     // No need to re-attach below if renderStudentTable is called
+                     return; // Exit after re-rendering main table
+                 }
+             }
+
+             // Restaura o conteúdo da célula para mostrar o novo valor
+              // Para selects, mostra o texto da opção selecionada
+              const displayValue = inputElement.tagName === 'SELECT'
+                 ? inputElement.options[inputElement.selectedIndex].textContent
+                 : newValue;
+
+              cell.innerHTML = `<span>${displayValue}</span>`;
+
+             // Re-anexa os listeners nas células editáveis da tabela ATUAL (principal ou professor)
+             // Chama attachInlineEditingEvents() para re-anexar em todas as células editáveis da DOM.
+             // Isso é seguro porque remove listeners anteriores antes de adicionar.
+             attachInlineEditingEvents();
+
+         } else {
+              console.error('Erro ao salvar: Aluno ou disciplina não encontrados.');
+              // Em caso de erro, re-renderiza a tabela para voltar ao estado anterior salvo
+              // Re-render the relevant table
+              if (isProfessorTable) {
+                  renderProfessorStudentTable(); // Re-render professor's table
+              } else {
+                  renderStudentTable(); // Re-render main table
+              }
+         }
+     }
+
+     // Handler específico para selects, pois o 'change' indica a seleção
+     function handleChangeEditableCell(event) {
+          // No 'change' de um select, chamamos o handler de blur para salvar.
+          // Isso garante que a mudança é salva imediatamente após a seleção, mesmo sem perder o foco do elemento (o que pode acontecer).
+         handleBlurEditableCell(event);
+     }
+
+     // Handler para salvar com a tecla Enter em inputs (e selects, embora menos comum)
+     function handleKeydownEditableCell(event) {
+          if (event.key === 'Enter') {
+             event.preventDefault(); // Evita que o Enter cause submit ou outra ação padrão
+             // Chama o handler de blur para salvar, garantindo que o valor mais recente seja usado
+             event.target.blur();
+          }
+     }
+
 
     function renderStudentSelect() {
         const studentSelect = document.getElementById('studentSelect');
+        const currentVal = studentSelect.value; // Salvar valor atual se houver
         studentSelect.innerHTML = '<option value="">Selecione o Aluno</option>';
-        students.forEach(student => {
-            const option = document.createElement('option');
-            option.value = student.name;
-            option.textContent = student.name;
-            studentSelect.appendChild(option);
-        });
+        // Só popula o select para adicionar disciplina se for Admin ou Coordenador
+        if (userRole === 'admin' || userRole === 'coordinator') {
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.name;
+                option.textContent = `${student.name} (${student.class} - ${student.unit})`; // Nome + Turma + Turno
+                studentSelect.appendChild(option);
+            });
+        }
+        studentSelect.value = currentVal; // Restaura valor se possível
     }
 
     function renderStudentSelectPrint() {
         const studentSelectPrint = document.getElementById('studentSelectPrint');
+        const currentVal = studentSelectPrint.value;
         studentSelectPrint.innerHTML = '<option value="">Selecione o Aluno</option>';
         students.forEach(student => {
             const option = document.createElement('option');
             option.value = student.name;
-            option.textContent = student.name;
+            option.textContent = `${student.name} (${student.class} - ${student.unit})`;
             studentSelectPrint.appendChild(option);
         });
+         studentSelectPrint.value = currentVal;
     }
 
-    function deleteStudent(name) {
-        if (!confirm(`Tem certeza que deseja excluir o aluno ${name} e todas as suas disciplinas?`)) return;
-        const index = students.findIndex(student => student.name === name);
-        if (index !== -1) {
-            students.splice(index, 1);
-            localStorage.setItem('students', JSON.stringify(students));
-            renderAll();
+    function searchStudent() {
+        const searchName = document.getElementById('searchName').value.toLowerCase();
+        if (!searchName) {
+            renderStudentTable(students); // Se a busca estiver vazia, mostra todos
+            return;
         }
-    }
-
-    function deleteDiscipline(studentName, disciplineNameToDelete, disciplineUnitToDelete) {
-        if (!confirm(`Tem certeza que deseja excluir a disciplina ${disciplineNameToDelete} (Unidade: ${disciplineUnitToDelete}) do aluno ${studentName}?`)) return;
-        const student = students.find(s => s.name === studentName);
-        if (student) {
-            const disciplineIndex = student.disciplines.findIndex(d => d.discipline === disciplineNameToDelete && d.unit === disciplineUnitToDelete);
-            if (disciplineIndex !== -1) {
-                student.disciplines.splice(disciplineIndex, 1);
-                localStorage.setItem('students', JSON.stringify(students));
-                renderAll();
-            }
-        }
+        const filtered = students.filter(student => student.name.toLowerCase().includes(searchName));
+        renderStudentTable(filtered);
     }
 
     function printAllReports() {
-        const selectedUnits = [...document.querySelectorAll('.unitCheckbox:checked')].map(checkbox => checkbox.value);
-        const reportType = document.querySelector('input[name="reportType"]:checked').value;
-
-        if(selectedUnits.length === 0){
-            alert("Por favor, selecione pelo menos uma unidade para imprimir.");
-            return;
-        }
-
-        const printWindow = window.open('', '', 'height=600,width=800');
-        let reportContent = '<html><head><title>Relatório de Notas</title>';
-        reportContent += `<style>
-            body{font-family:Arial, sans-serif; margin: 20px;}
-            table{width:100%;border-collapse:collapse; margin-bottom: 20px;}
-            td,th{border:1px solid #ddd;padding:8px;text-align:center;}
-            th{background-color:#1a73e8;color:white;}
-            h1, h2, h3 { color: #1a73e8; text-align: center; }
-            .student-report { page-break-after: always; } 
-            .student-report:last-child { page-break-after: avoid; } 
-            </style></head><body>`;
-        reportContent += '<h1>SENAC PAULISTA-PE</h1>';
-        reportContent += '<h2>Boletim Escolar 2025</h2>';
-
-        students.forEach((student) => {
-            const disciplinesToPrint = student.disciplines.filter(discipline => selectedUnits.includes(discipline.unit));
-            if (disciplinesToPrint.length === 0 && !selectedUnits.includes("all")) return; 
-
-            reportContent += `<div class="student-report">`;
-            reportContent += `<h3>Aluno: ${student.name}</h3>`;
-            reportContent += `<p style="text-align:center;">Curso: ${student.course} | Turma: ${student.class} | Turno: ${student.unit}</p>`;
-            reportContent += '<table><thead><tr><th>Disciplina</th><th>Unidade</th>';
-            if (reportType === 'full') {
-                reportContent += '<th>Avaliação 1</th><th>Avaliação 2</th>';
-            }
-            reportContent += '<th>Menção Final</th><th>Situação</th></tr></thead><tbody>';
-
-            if (disciplinesToPrint.length > 0) {
-                disciplinesToPrint.forEach(discipline => {
-                    reportContent += `<tr>
-                        <td>${discipline.discipline}</td>
-                        <td>${discipline.unit}</td>
-                        ${reportType === 'full' ? `<td>${discipline.evaluation1}</td><td>${discipline.evaluation2}</td>` : ''}
-                        <td>${discipline.finalGrade}</td>
-                        <td>${discipline.finalGrade === 'D' ? 'Aprovado' : 'Reprovado'}</td>
-                    </tr>`;
-                });
-            } else {
-                 reportContent += `<tr><td colspan="${reportType === 'full' ? 6 : 4}">Nenhuma disciplina encontrada para as unidades selecionadas.</td></tr>`;
-            }
-            reportContent += '</tbody></table></div>';
-        });
-
-        reportContent += '</body></html>';
-        printWindow.document.write(reportContent);
-        printWindow.document.close();
-        printWindow.print();
+        // Oculta elementos indesejados para impressão via CSS @media print
+        window.print();
     }
 
     function printStudentReport() {
-        const selectedStudentName = document.getElementById('studentSelectPrint').value;
-        const selectedUnits = [...document.querySelectorAll('.unitCheckbox:checked')].map(checkbox => checkbox.value);
-        const reportType = document.querySelector('input[name="reportType"]:checked').value;
+         const studentName = document.getElementById('studentSelectPrint').value;
+         const selectedUnits = Array.from(document.querySelectorAll('.unitCheckbox:checked')).map(cb => cb.value);
+         const reportType = document.querySelector('input[name="reportType"]:checked').value; // 'full' or 'summary'
 
-        if (!selectedStudentName) {
-            alert('Por favor, selecione um aluno.');
-            return;
-        }
-        if (selectedUnits.length === 0) {
-            alert("Por favor, selecione pelo menos uma unidade para imprimir.");
-            return;
-        }
+         if (!studentName) {
+             alert('Por favor, selecione um aluno para imprimir.');
+             return;
+         }
+         if (selectedUnits.length === 0) {
+             alert('Por favor, selecione pelo menos uma unidade para imprimir.');
+             return;
+         }
 
-        const student = students.find(s => s.name === selectedStudentName);
-        if (!student) {
-            alert('Aluno não encontrado.');
-            return;
-        }
+         const student = students.find(s => s.name === studentName);
+         if (!student) {
+             alert('Erro: Aluno não encontrado.');
+             return;
+         }
 
-        const disciplinesToPrint = student.disciplines.filter(discipline => selectedUnits.includes(discipline.unit));
+         // Gera o conteúdo HTML para impressão
+         let printContent = `
+            <div class="student-report">
+                 <div style="text-align: center; margin-bottom: 20px;">
+                    <h1 style="color: #000 !important; border-bottom: none;">Boletim do Aluno - MÉDIOTEC</h1>
+                    <p><strong>Nome:</strong> ${student.name}</p>
+                    <p><strong>Curso:</strong> ${student.course}</p>
+                    <p><strong>Turma:</strong> ${student.class} - <strong>Turno:</strong> ${student.unit}</p>
+                 </div>
+         `;
 
-        const printWindow = window.open('', '', 'height=600,width=800');
-        let reportContent = '<html><head><title>Boletim do Aluno</title>';
-        reportContent += `<style>
-            body{font-family:Arial, sans-serif; margin: 20px;}
-            table{width:100%;border-collapse:collapse;}
-            td,th{border:1px solid #ddd;padding:8px;text-align:center;}
-            th{background-color:#1a73e8;color:white;}
-            h1, h2, h3 { color: #1a73e8; text-align: center;}
-            </style></head><body>`;
-        reportContent += '<h1>SENAC PAULISTA-PE</h1>';
-        reportContent += '<h2>Boletim Escolar 2025</h2>';
-        reportContent += `<h3>Aluno: ${student.name}</h3>`;
-        reportContent += `<p style="text-align:center;">Curso: ${student.course} | Turma: ${student.class} | Turno: ${student.unit}</p>`;
-        reportContent += '<table><thead><tr><th>Disciplina</th><th>Unidade</th>';
-        if (reportType === 'full') {
-            reportContent += '<th>Avaliação 1</th><th>Avaliação 2</th>';
-        }
-        reportContent += '<th>Menção Final</th><th>Situação</th></tr></thead><tbody>';
+         const filteredDisciplines = student.disciplines.filter(d => selectedUnits.includes(d.unit));
+         const sortedDisciplines = [...filteredDisciplines].sort((a, b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit);
 
-        if (disciplinesToPrint.length > 0) {
-            disciplinesToPrint.forEach(discipline => {
-                reportContent += `<tr>
-                    <td>${discipline.discipline}</td>
-                    <td>${discipline.unit}</td>
-                    ${reportType === 'full' ? `<td>${discipline.evaluation1}</td><td>${discipline.evaluation2}</td>` : ''}
-                    <td>${discipline.finalGrade}</td>
-                    <td>${discipline.finalGrade === 'D' ? 'Aprovado' : 'Reprovado'}</td>
-                </tr>`;
-            });
-        } else {
-            reportContent += `<tr><td colspan="${reportType === 'full' ? 6 : 4}">Nenhuma disciplina encontrada para as unidades selecionadas.</td></tr>`;
-        }
 
-        reportContent += '</tbody></table></body></html>';
-        printWindow.document.write(reportContent);
-        printWindow.document.close();
-        printWindow.print();
-    }
+         printContent += `
+             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+                 <thead>
+                     <tr>
+                         <th>Disciplina</th>
+                         <th>Unidade</th>
+                         ${reportType === 'full' ? '<th>Avaliação 1</th><th>Avaliação 2</th>' : ''}
+                         <th>Menção Final</th>
+                         <th>Situação</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+         `;
 
+         if (sortedDisciplines.length === 0) {
+             printContent += `<tr><td colspan="${reportType === 'full' ? 5 : 3}">Nenhuma disciplina encontrada para as unidades selecionadas.</td></tr>`;
+         } else {
+              sortedDisciplines.forEach(discipline => {
+                 printContent += `
+                     <tr>
+                         <td>${discipline.discipline}</td>
+                         <td>${discipline.unit}</td>
+                         ${reportType === 'full' ? `<td>${discipline.evaluation1}</td><td>${discipline.evaluation2}</td>` : ''}
+                         <td>${discipline.finalGrade}</td>
+                         <td>${getStudentSituation(discipline.finalGrade)}</td>
+                     </tr>
+                 `;
+             });
+         }
+
+
+         printContent += `
+                 </tbody>
+             </table>
+             </div> `;
+
+         // Cria uma nova janela ou iframe para a impressão
+         const printWindow = window.open('', '_blank');
+         printWindow.document.write(`
+             <html>
+             <head>
+                 <title>Boletim de ${student.name}</title>
+                 <style>
+                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 1.5cm; }
+                     table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                     th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 10pt; }
+                     th { background-color: #ddd; font-weight: bold; }
+                     h1, h2, h3 { color: #000; page-break-after: avoid; }
+                     @media print {
+                         body { margin: 0; } /* Remove margem extra na impressão real */
+                         @page { size: A4; margin: 1.5cm; }
+                          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } /* Para imprimir cores de fundo */
+                          /* Ensure table elements do not break across pages */
+                         table, tr, td, th { page-break-inside: avoid !important; }
+                     }
+                 </style>
+             </head>
+             <body>${printContent}</body>
+             </html>
+         `);
+         printWindow.document.close();
+         printWindow.print();
+     }
+
+
+    // --- Funções do Modal de Adicionar Professor ---
     function showAddProfessorForm() {
-        const modal = document.getElementById('addProfessorModal');
-        document.getElementById('professorNameInput').value = ''; // Limpa o campo nome
-        populateCheckboxes('professorDisciplinesCheckboxes', 'disciplineSelect', 'prof_disc_');
-        populateCheckboxes('professorClassesCheckboxes', 'class', 'prof_class_');
-        modal.classList.remove('hidden');
+         if (userRole !== 'admin') {
+             alert('Você não tem permissão para adicionar professores.');
+             return;
+         }
+        document.getElementById('addProfessorModal').classList.remove('hidden');
+         // Chamar a função correta para popular os checkboxes do modal de adição de professor
+         populateAssignmentCheckboxes('professorDisciplinesCheckboxes', 'professorClassesCheckboxes');
     }
 
     function closeAddProfessorModal() {
         document.getElementById('addProfessorModal').classList.add('hidden');
+        // Limpa os campos do modal
+        document.getElementById('newProfessorNameInput').value = '';
+        document.getElementById('newProfessorUsernameInput').value = '';
+        document.getElementById('newProfessorPasswordInput').value = '';
+        // Não limpa os checkboxes, apenas seu conteúdo é atualizado ao abrir o modal
     }
 
-    function populateCheckboxes(containerId, selectElementId, idPrefix) {
-        const container = document.getElementById(containerId);
-        const selectElement = document.getElementById(selectElementId);
-        container.innerHTML = ''; // Limpa checkboxes anteriores
+     // Função para popular os checkboxes de disciplinas e turmas (usada para Adicionar e Editar)
+    function populateAssignmentCheckboxes(disciplinesDivId, classesDivId, userDisciplines = [], userClasses = []) {
+         const disciplinesDiv = document.getElementById(disciplinesDivId);
+         const classesDiv = document.getElementById(classesDivId);
 
-        Array.from(selectElement.options).forEach(option => {
-            if (option.value) { 
-                const div = document.createElement('div');
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = `${idPrefix}${option.value.replace(/\s+/g, '_').toLowerCase()}`;
-                checkbox.value = option.value;
-                checkbox.name = containerId; // Usar o ID do container como nome do grupo
+         // Limpa conteúdo anterior
+         disciplinesDiv.innerHTML = '';
+         classesDiv.innerHTML = '';
 
-                const label = document.createElement('label');
-                label.htmlFor = checkbox.id;
-                label.textContent = option.textContent;
+         // Popula Disciplinas usando a lista mestra
+         if (availableDisciplines.length === 0) {
+             disciplinesDiv.innerHTML = '<p>Nenhuma disciplina disponível na lista mestra.</p>';
+         } else {
+              availableDisciplines.forEach(discipline => {
+                  const div = document.createElement('div');
+                  const checkbox = document.createElement('input');
+                  checkbox.type = 'checkbox';
+                   // Use escape no valor para garantir que caracteres especiais funcionem
+                  checkbox.value = escape(discipline);
+                  if (userDisciplines.includes(discipline)) { // Marca se estiver atribuído
+                      checkbox.checked = true;
+                  }
+                  const label = document.createElement('label');
+                  label.textContent = discipline;
+                  div.appendChild(checkbox);
+                  div.appendChild(label);
+                  disciplinesDiv.appendChild(div);
+              });
+         }
 
-                div.appendChild(checkbox);
-                div.appendChild(label);
-                container.appendChild(div);
-            }
-        });
+
+         // Popula Turmas usando a lista mestra
+         if (availableClasses.length === 0) {
+             classesDiv.innerHTML = '<p>Nenhuma turma disponível na lista mestra.</p>';
+         } else {
+              availableClasses.forEach(className => {
+                  const div = document.createElement('div');
+                  const checkbox = document.createElement('input');
+                  checkbox.type = 'checkbox';
+                   // Use escape no valor para garantir que caracteres especiais funcionem
+                  checkbox.value = escape(className);
+                   if (userClasses.includes(className)) { // Marca se estiver atribuído
+                      checkbox.checked = true;
+                   }
+                  const label = document.createElement('label');
+                  label.textContent = className;
+                  div.appendChild(checkbox);
+                  div.appendChild(label);
+                  classesDiv.appendChild(div);
+              });
+         }
     }
-    
+
     function saveProfessor() {
-        const professorName = document.getElementById('professorNameInput').value.trim();
-        if (!professorName) {
-            alert('Por favor, insira o nome do professor.');
+         if (userRole !== 'admin') {
+             alert('Você não tem permissão para salvar professores.');
+             return;
+         }
+
+        const name = document.getElementById('newProfessorNameInput').value.trim();
+        const username = document.getElementById('newProfessorUsernameInput').value.trim();
+        const password = document.getElementById('newProfessorPasswordInput').value; // Senha não trim
+         // Use unescape para obter os valores reais dos checkboxes do modal de ADIÇÃO de professor
+        const selectedDisciplines = Array.from(document.querySelectorAll('#professorDisciplinesCheckboxes input:checked')).map(cb => unescape(cb.value));
+        const selectedClasses = Array.from(document.querySelectorAll('#professorClassesCheckboxes input:checked')).map(cb => unescape(cb.value));
+
+        if (!name || !username || !password) {
+            alert('Por favor, preencha Nome, Usuário e Senha do professor.');
             return;
         }
 
-        const selectedDisciplines = Array.from(document.querySelectorAll('#professorDisciplinesCheckboxes input[type="checkbox"]:checked'))
-                                       .map(cb => cb.value);
+        // Verifica se o username já existe (entre todos os usuários)
+        const usernameExists = (users.admin && users.admin.username === username)
+                             || users.coordinators.some(c => c.username === username)
+                             || users.professors.some(p => p.username === username);
 
-        const selectedClasses = Array.from(document.querySelectorAll('#professorClassesCheckboxes input[type="checkbox"]:checked'))
-                                   .map(cb => cb.value);
-
-        if (selectedDisciplines.length === 0) {
-            alert('Por favor, selecione pelo menos uma disciplina para o professor.');
+        if (usernameExists) {
+            alert(`O usuário "${username}" já existe. Por favor, escolha outro.`);
             return;
         }
 
-        if (selectedClasses.length === 0) {
-            alert('Por favor, selecione pelo menos uma turma para o professor.');
-            return;
-        }
-        
         const newProfessor = {
-            id: `prof_${Date.now()}`,
-            name: professorName,
+            name: name,
+            username: username,
+            password: password, // Em um sistema real, a senha deve ser hasheada!
+            role: 'professor',
             disciplines: selectedDisciplines,
             classes: selectedClasses
         };
 
-        teachersData.push(newProfessor);
-        localStorage.setItem('teachersData', JSON.stringify(teachersData));
-
-        alert(`Professor ${professorName} adicionado com sucesso!`);
-        console.log("Professores cadastrados:", teachersData); 
+        users.professors.push(newProfessor);
+        localStorage.setItem('users', JSON.stringify(users));
+        alert('Professor adicionado com sucesso!');
         closeAddProfessorModal();
+        // Se estiver na página de gerenciar usuários, atualiza a lista
+        if (!manageUsersSection.classList.contains('hidden')) {
+             renderUsersTable();
+        }
     }
 
+    // --- Funções do Modal de Adicionar Coordenador ---
+     function showAddCoordenadorForm() {
+          if (userRole !== 'admin') {
+              alert('Você não tem permissão para adicionar coordenadores.');
+              return;
+          }
+          document.getElementById('addCoordinatorModal').classList.remove('hidden');
+          // Limpa campos do modal
+          document.getElementById('newCoordinatorNameInput').value = '';
+          document.getElementById('newCoordinatorUsernameInput').value = '';
+          document.getElementById('newCoordinatorPasswordInput').value = '';
+     }
 
-    function showAddCoordenadorForm() {
-        alert('Funcionalidade "Adicionar Coordenador" ainda não implementada.');
+     function closeAddCoordenadorModal() {
+         document.getElementById('addCoordinatorModal').classList.add('hidden');
+         // Limpa campos do modal
+         document.getElementById('newCoordinatorNameInput').value = '';
+         document.getElementById('newCoordinatorUsernameInput').value = '';
+         document.getElementById('newCoordinatorPasswordInput').value = '';
+     }
+
+     function saveCoordinator() {
+          if (userRole !== 'admin') {
+              alert('Você não tem permissão para salvar coordenadores.');
+              return;
+          }
+
+         const name = document.getElementById('newCoordinatorNameInput').value.trim();
+         const username = document.getElementById('newCoordinatorUsernameInput').value.trim();
+         const password = document.getElementById('newCoordinatorPasswordInput').value; // Sem trim
+
+         if (!name || !username || !password) {
+             alert('Por favor, preencha Nome, Usuário e Senha do coordenador.');
+             return;
+         }
+
+         // Verifica se o username já existe
+         const usernameExists = (users.admin && users.admin.username === username)
+                              || users.coordinators.some(c => c.username === username)
+                              || users.professors.some(p => p.username === username);
+
+         if (usernameExists) {
+             alert(`O usuário "${username}" já existe. Por favor, escolha outro.`);
+             return;
+         }
+
+         const newCoordinator = {
+             name: name,
+             username: username,
+             password: password, // Em um sistema real, a senha deve ser hasheada!
+             role: 'coordinator'
+             // Coordenadores não têm disciplinas ou turmas atribuídas neste modelo
+         };
+
+         users.coordinators.push(newCoordinator);
+         localStorage.setItem('users', JSON.stringify(users));
+         alert('Coordenador adicionado com sucesso!');
+         closeAddCoordinatorModal();
+          // Se estiver na página de gerenciar usuários, atualiza a lista
+         if (!manageUsersSection.classList.contains('hidden')) {
+              renderUsersTable();
+         }
+     }
+
+
+    // --- Funções da Seção de Gerenciar Usuários ---
+     function renderUsersTable() {
+         const usersTableBody = document.getElementById('usersTable').querySelector('tbody');
+         const noUsersMessage = document.getElementById('noUsersMessage');
+         usersTableBody.innerHTML = ''; // Limpa a tabela
+
+         // Lista todos os coordenadores e professores
+         const allUsers = [...users.coordinators, ...users.professors];
+
+         if (allUsers.length === 0) {
+             noUsersMessage.classList.remove('hidden');
+             usersTable.classList.add('hidden'); // Oculta a tabela se não houver usuários
+         } else {
+              noUsersMessage.classList.add('hidden');
+              usersTable.classList.remove('hidden'); // Mostra a tabela
+
+             allUsers.forEach(user => {
+                 const row = document.createElement('tr');
+                 row.innerHTML = `
+                     <td>${user.name || '-'}</td>
+                     <td>${user.username}</td>
+                     <td>${user.role === 'coordinator' ? 'Coordenador' : 'Professor'}</td>
+                     <td>${user.role === 'professor' && Array.isArray(user.disciplines) && user.disciplines.length > 0 ? user.disciplines.join(', ') : '-'}</td> <td>${user.role === 'professor' && Array.isArray(user.classes) && user.classes.length > 0 ? user.classes.join(', ') : '-'}</td> <td>${user.password || '-'}</td> <td>
+                         <button type="button" class="button" style="width:auto; display:inline-block; margin:2px;" onclick="editUser('${escape(user.username)}', '${user.role}')">Editar</button>
+                         <button type="button" class="button delete-button" style="width:auto; display:inline-block; margin:2px;" onclick="deleteUser('${escape(user.username)}', '${user.role}')">Excluir</button>
+                     </td>
+                 `;
+                 usersTableBody.appendChild(row);
+             });
+         }
+     }
+
+    // --- Funções do Modal de Editar Usuário ---
+     function editUser(username, role) {
+         if (userRole !== 'admin') {
+             alert('Você não tem permissão para editar usuários.');
+             return;
+         }
+
+         const realUsername = unescape(username);
+
+         // Encontra o usuário correto (professor ou coordenador)
+         let userToEdit = null;
+          if (role === 'coordinator') {
+              userToEdit = users.coordinators.find(c => c.username === realUsername);
+          } else if (role === 'professor') {
+              userToEdit = users.professors.find(p => p.username === realUsername);
+          }
+
+
+         if (!userToEdit) {
+             alert('Usuário não encontrado.');
+             return;
+         }
+
+         // Impede a edição do admin principal hardcoded
+         if (userToEdit.role === 'admin' && userToEdit.username === initialUsersStructure.admin.username) {
+              alert('Não é possível editar o usuário administrador principal por esta interface.');
+              return;
+         }
+
+
+         // Preenche os campos do modal
+         document.getElementById('editUserModalTitle').textContent = `Editar ${userToEdit.role === 'coordinator' ? 'Coordenador' : 'Professor'}`;
+         document.getElementById('editUserOriginalUsername').value = userToEdit.username; // Guarda o username original
+         document.getElementById('editUserRole').value = userToEdit.role;
+
+         document.getElementById('editUserNameInput').value = userToEdit.name || '';
+         document.getElementById('editUserUsernameInput').value = userToEdit.username;
+         document.getElementById('editUserPasswordInput').value = ''; // Deixa vazio para não alterar
+
+         // Lida com as atribuições (visível apenas para professores)
+         const editProfessorAssignmentsDiv = document.getElementById('editProfessorAssignments');
+         if (userToEdit.role === 'professor') {
+             editProfessorAssignmentsDiv.classList.remove('hidden');
+              // Popula os checkboxes no modal de edição com as atribuições atuais do professor
+              // Usa a função genérica de popular checkboxes, direcionando para os IDs corretos do modal de edição
+             populateAssignmentCheckboxes('editProfessorDisciplinesCheckboxes', 'editProfessorClassesCheckboxes', userToEdit.disciplines || [], userToEdit.classes || []);
+
+         } else {
+             editProfessorAssignmentsDiv.classList.add('hidden');
+         }
+
+
+         // Mostra o modal de edição
+         document.getElementById('editUserModal').classList.remove('hidden');
+     }
+
+     function closeEditUserModal() {
+         document.getElementById('editUserModal').classList.add('hidden');
+         // Limpa os campos (opcional, mas boa prática)
+         document.getElementById('editUserNameInput').value = '';
+         document.getElementById('editUserUsernameInput').value = '';
+         document.getElementById('editUserPasswordInput').value = '';
+         document.getElementById('editUserOriginalUsername').value = '';
+         document.getElementById('editUserRole').value = '';
+          // Limpa os checkboxes da modal de edição
+          document.getElementById('editProfessorDisciplinesCheckboxes').innerHTML = '';
+          document.getElementById('editProfessorClassesCheckboxes').innerHTML = '';
+
+     }
+
+     function saveEditedUser() {
+          if (userRole !== 'admin') {
+              alert('Você não tem permissão para salvar alterações de usuários.');
+              return;
+          }
+
+         const originalUsername = document.getElementById('editUserOriginalUsername').value;
+         const role = document.getElementById('editUserRole').value;
+         const newName = document.getElementById('editUserNameInput').value.trim();
+         const newUsername = document.getElementById('editUserUsernameInput').value.trim();
+         const newPassword = document.getElementById('editUserPasswordInput').value; // Sem trim
+
+         // Impede alteração do admin principal por esta função
+         if (role === 'admin' && originalUsername === initialUsersStructure.admin.username) {
+              alert('Não é possível alterar o usuário administrador principal por esta interface.');
+              return;
+         }
+
+
+         if (!newName || !newUsername) {
+             alert('Por favor, preencha Nome e Usuário.');
+             return;
+         }
+
+         // Verifica se o novo username já existe, EXCETO se for o username original do usuário que está sendo editado
+         const usernameExists = (users.admin && users.admin.username === newUsername && newUsername !== originalUsername)
+                              || users.coordinators.some(c => c.username === newUsername && newUsername !== originalUsername)
+                              || users.professors.some(p => p.username === newUsername && newUsername !== originalUsername);
+
+         if (usernameExists) {
+             alert(`O usuário "${newUsername}" já existe para outro usuário. Por favor, escolha outro.`);
+             return;
+         }
+
+         // Encontra o usuário no array correto (coordinadores ou professores)
+         let userArray = null;
+         if(role === 'coordinator') userArray = users.coordinators;
+         else if (role === 'professor') userArray = users.professors;
+
+         if (!userArray) {
+              console.error("Tipo de papel desconhecido:", role);
+              alert("Erro ao salvar: Tipo de usuário inválido.");
+              return;
+         }
+
+         const userIndex = userArray.findIndex(u => u.username === originalUsername);
+
+
+         if (userIndex !== -1) {
+             // Atualiza os dados do usuário
+             userArray[userIndex].name = newName;
+             userArray[userIndex].username = newUsername;
+             // Atualiza a senha apenas se um novo valor foi digitado
+             if (newPassword !== '') {
+                 userArray[userIndex].password = newPassword; // Em sistema real: hashear senha
+             }
+
+             // Atualiza atribuições apenas para professores
+             if (role === 'professor') {
+                 // Pega os checkboxes DENTRO do modal de edição
+                 const selectedDisciplines = Array.from(document.querySelectorAll('#editProfessorDisciplinesCheckboxes input:checked')).map(cb => unescape(cb.value));
+                 const selectedClasses = Array.from(document.querySelectorAll('#editProfessorClassesCheckboxes input:checked')).map(cb => unescape(cb.value));
+                 userArray[userIndex].disciplines = selectedDisciplines;
+                 userArray[userIndex].classes = selectedClasses;
+             }
+
+             // Salva no localStorage
+             localStorage.setItem('users', JSON.stringify(users));
+             alert('Usuário atualizado com sucesso!');
+             closeEditUserModal();
+             renderUsersTable(); // Atualiza a lista na página de gerenciamento de usuários
+
+             // Se o próprio usuário logado teve seu username alterado, força logout
+             // Verifica se currentUser existe e se é o usuário que acabou de ser editado e se o username mudou
+             if (currentUser && currentUser.role === role && currentUser.username === originalUsername && newUsername !== originalUsername) {
+                 alert('Seu nome de usuário foi alterado. Por favor, faça login novamente com o novo usuário.');
+                 // Atualiza o currentUser localmente antes de deslogar para mostrar a mensagem correta
+                 currentUser.username = newUsername;
+                 logout(); // Força o logout para que o próximo login use o novo username
+             }
+
+         } else {
+             alert('Erro: Usuário a ser editado não encontrado.');
+         }
+     }
+
+     function deleteUser(username, role) {
+         if (userRole !== 'admin') {
+             alert('Você não tem permissão para excluir usuários.');
+             return;
+         }
+
+         const realUsername = unescape(username); // Desescapa o username para comparação
+
+         // Impede a exclusão do admin principal hardcoded
+         if (role === 'admin' && realUsername === initialUsersStructure.admin.username) {
+             alert('Não é possível excluir o usuário administrador principal.');
+             return;
+         }
+         // Impede que um usuário logado (coordenador ou professor) exclua a si mesmo.
+         // O admin logado PODE excluir outros coordenadores/professores, mas não a si mesmo (admin).
+         if (currentUser && currentUser.role === role && currentUser.username === realUsername) {
+              alert('Você não pode excluir a si mesmo.');
+              return;
+         }
+
+
+         if (confirm(`Tem certeza que deseja excluir o usuário "${realUsername}" (${role === 'coordinator' ? 'Coordenador' : 'Professor'})?`)) {
+             let userArray = null;
+              if(role === 'coordinator') userArray = users.coordinators;
+              else if (role === 'professor') userArray = users.professors;
+
+             if (!userArray) {
+                 console.error("Tipo de papel desconhecido para exclusão:", role);
+                 alert("Erro ao excluir: Tipo de usuário inválido.");
+                 return;
+             }
+
+             const initialLength = userArray.length;
+             // Encontra o índice exato para remover
+             const indexToDelete = userArray.findIndex(u => u.username === realUsername);
+
+             if (indexToDelete !== -1) {
+                 userArray.splice(indexToDelete, 1);
+                 localStorage.setItem('users', JSON.stringify(users));
+
+                 if (userArray.length < initialLength) {
+                     alert('Usuário excluído com sucesso.');
+                     renderUsersTable(); // Atualiza a lista na página de gerenciamento de usuários
+
+                 } else {
+                      alert('Erro interno ao excluir usuário.'); // Caso splice não remova
+                 }
+             } else {
+                  alert('Erro ao excluir usuário. Usuário não encontrado.'); // Caso findIndex falhe
+             }
+         }
+     }
+
+    // --- Funções da Seção do Professor ---
+     function populateProfessorAssignmentDropdowns() {
+         const disciplineSelect = document.getElementById('professorDisciplineSelect');
+         const classSelect = document.getElementById('professorClassSelect');
+         const unitSelect = document.getElementById('professorUnitSelect');
+
+         // Limpa as opções anteriores (exceto a opção "Selecione...")
+         disciplineSelect.innerHTML = '<option value="">Selecione a Disciplina</option>';
+         classSelect.innerHTML = '<option value="">Selecione a Turma</option>';
+         unitSelect.value = ''; // Reseta a unidade selecionada
+
+         if (currentUser && currentUser.role === 'professor') {
+             // Popula o dropdown de Disciplinas com as disciplinas atribuídas ao professor logado
+             if (Array.isArray(currentUser.disciplines)) {
+                  currentUser.disciplines.sort().forEach(discipline => {
+                     const option = document.createElement('option');
+                     option.value = discipline;
+                     option.textContent = discipline;
+                     disciplineSelect.appendChild(option);
+                 });
+             }
+
+             // Popula o dropdown de Turmas com as turmas atribuídas ao professor logado
+             if (Array.isArray(currentUser.classes)) {
+                  currentUser.classes.sort().forEach(className => {
+                     const option = document.createElement('option');
+                     option.value = className;
+                     option.textContent = className;
+                     classSelect.appendChild(option);
+                 });
+             }
+         }
+
+         // Adiciona/remove os event listeners para renderizar a tabela quando as seleções mudam
+         // Remove antes de adicionar para evitar duplicação
+         disciplineSelect.removeEventListener('change', renderProfessorStudentTable);
+         classSelect.removeEventListener('change', renderProfessorStudentTable);
+         unitSelect.removeEventListener('change', renderProfessorStudentTable);
+
+         disciplineSelect.addEventListener('change', renderProfessorStudentTable);
+         classSelect.addEventListener('change', renderProfessorStudentTable);
+         unitSelect.addEventListener('change', renderProfessorStudentTable);
+
+         // Renderiza a tabela inicialmente vazia ou com dados se as opções já estiverem selecionadas (improvável no login)
+          renderProfessorStudentTable();
     }
 
-    function renderAll(){
+     function renderProfessorStudentTable() {
+         const disciplineSelect = document.getElementById('professorDisciplineSelect');
+         const classSelect = document.getElementById('professorClassSelect');
+         const unitSelect = document.getElementById('professorUnitSelect');
+         const professorStudentTableBody = document.getElementById('professorStudentTable').querySelector('tbody');
+         const professorNoStudentsMessage = document.getElementById('professorNoStudentsMessage');
+         const professorStudentTable = document.getElementById('professorStudentTable');
+
+
+         const selectedDiscipline = disciplineSelect.value;
+         const selectedClass = classSelect.value;
+         const selectedUnit = unitSelect.value;
+
+         professorStudentTableBody.innerHTML = ''; // Limpa o corpo da tabela
+         professorNoStudentsMessage.classList.remove('hidden'); // Mostra mensagem por padrão
+         professorStudentTable.classList.add('hidden'); // Oculta tabela por padrão
+
+
+         if (!selectedDiscipline || !selectedClass || !selectedUnit) {
+             // Se nem todas as seleções foram feitas, mostra a mensagem apropriada e oculta a tabela
+              if (!selectedDiscipline && !selectedClass && !selectedUnit) {
+                 professorNoStudentsMessage.textContent = 'Selecione a disciplina, turma e unidade acima para ver os alunos.';
+              } else {
+                  professorNoStudentsMessage.textContent = 'Por favor, selecione a disciplina, turma E unidade.';
+              }
+              professorNoStudentsMessage.classList.remove('hidden');
+              professorStudentTable.classList.add('hidden');
+             return;
+         }
+
+         // Filtra alunos com base na turma SELECIONADA, turno SELECIONADO E se TÊM a disciplina SELECIONADA para a unidade SELECIONADA
+         const filteredStudents = students.filter(student =>
+             student.class === selectedClass && // O aluno está na turma selecionada?
+             student.unit === selectedUnit && // O aluno está no turno selecionado?
+             student.disciplines.some(d => d.discipline === selectedDiscipline && d.unit === selectedUnit) // O aluno tem a disciplina selecionada para a unidade selecionada?
+         );
+
+         if (filteredStudents.length === 0) {
+             // Nenhum aluno encontrado que corresponda aos critérios
+              professorNoStudentsMessage.textContent = `Nenhum aluno encontrado na turma "${selectedClass}" do turno "${selectedUnit}" com a disciplina "${selectedDiscipline}" cadastrada.`;
+              professorNoStudentsMessage.classList.remove('hidden');
+              professorStudentTable.classList.add('hidden');
+             return;
+         }
+
+         // Alunos encontrados, oculta a mensagem e mostra a tabela
+         professorNoStudentsMessage.classList.add('hidden');
+         professorStudentTable.classList.remove('hidden');
+
+
+         filteredStudents.forEach(student => {
+             // Encontra a entrada específica da disciplina para a disciplina e unidade selecionadas deste aluno
+             const disciplineEntry = student.disciplines.find(d => d.discipline === selectedDiscipline && d.unit === selectedUnit);
+
+             if (disciplineEntry) { // Deve existir com base no filtro, mas é uma verificação de segurança
+                 const row = document.createElement('tr');
+
+                 // Use escape para data attributes
+                 const studentNameEscaped = escape(student.name);
+                 const disciplineNameEscaped = escape(disciplineEntry.discipline);
+
+                 row.innerHTML = `
+                     <td>${student.name}</td>
+                     <td>${student.course}</td>
+                     <td>${student.unit}</td> <td class="editable-cell" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="evaluation1"><span>${disciplineEntry.evaluation1}</span></td>
+                     <td class="editable-cell" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="evaluation2"><span>${disciplineEntry.evaluation2}</span></td>
+                     <td class="editable-cell" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="finalGrade"><span>${disciplineEntry.finalGrade}</span></td>
+                     <td>${getStudentSituation(disciplineEntry.finalGrade)}</td>
+                 `;
+                 professorStudentTableBody.appendChild(row);
+             }
+         });
+
+         // Anexa os eventos de edição inline às células nesta tabela
+         attachInlineEditingEvents(); // Chama para re-anexar em todas as células editáveis da DOM (seguro)
+     }
+
+
+
+    // Função para carregar e renderizar tudo ao iniciar (depois do login)
+    function renderAll() {
+        // Esta função agora só renderiza o conteúdo da seção de gerenciamento de alunos
         renderStudentTable();
         renderStudentSelect();
         renderStudentSelectPrint();
+        // populateAssignmentCheckboxes(); // Populado apenas ao abrir os modais
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('appContainer').classList.add('hidden');
-        document.getElementById('loginContainer').classList.remove('hidden');
-        document.body.style.display = 'flex'; 
-    });
+    // Helper para escapar caracteres para uso em data attributes e valores de input/onclick (evita problemas com aspas, etc.)
+     function escape(str) {
+         // encodeURIComponent é mais seguro para valores usados em URLs ou atributos de dados
+         return encodeURIComponent(str);
+     }
+     // Helper para "desescapar" caracteres
+     function unescape(str) {
+         return decodeURIComponent(str);
+     }
+
+
+    // Inicialização: Esconde o appContainer e mostra o login ao carregar a página
+     document.addEventListener('DOMContentLoaded', () => {
+         document.getElementById('appContainer').classList.add('hidden');
+         document.getElementById('loginContainer').classList.remove('hidden');
+          // Remove o logo original do app logo position inicialmente
+          const appLogo = document.getElementById('appLogo');
+          if(appLogo) appLogo.remove(); // Remove a tag img do logo
+
+          // Garante que as seções principais estejam ocultas inicialmente
+          studentManagementSection.classList.add('hidden');
+          manageUsersSection.classList.add('hidden');
+          professorSection.classList.add('hidden');
+
+          // A seção de gerenciamento de alunos é visível por padrão no HTML, mas o appContainer está oculto.
+          // A visibilidade da seção de alunos/usuários/professor é controlada após o login em finalizeLogin/setRolePermissions.
+
+     });
 
 </script>
+
 </body>
 </html>

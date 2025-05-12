@@ -214,6 +214,16 @@
             color: #00397a; /* Azul escuro */
             z-index: 1001;
         }
+        /* Relógio e Data - Canto Superior Esquerdo */
+         #dateTimeDisplay {
+             position: fixed;
+             top: 15px;
+             left: 25px;
+             font-size: 1.2em;
+             font-weight: bold;
+             color: #00397a; /* Azul escuro */
+             z-index: 1001;
+         }
 
 
         #mainContentArea h1 {
@@ -232,7 +242,21 @@
             box-sizing: border-box;
             font-size: 15px;
         }
-         input[type="text"]:disabled, select:disabled {
+         /* Textarea para observações */
+         textarea {
+            padding: 10px;
+            margin: 5px 0;
+            width: calc(100% - 10px); /* Ajusta largura considerando padding */
+            min-width: 250px;
+            min-height: 60px; /* Altura mínima */
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            box-sizing: border-box;
+            font-size: 15px;
+            resize: vertical; /* Permite redimensionar verticalmente */
+         }
+
+         input[type="text"]:disabled, select:disabled, textarea:disabled {
             background-color: #e9ecef;
             cursor: not-allowed;
          }
@@ -251,6 +275,7 @@
         .modal-content h2 { margin-top: 0; }
         .modal-content label{ display: block; margin-top: 10px; font-weight: bold; }
         .modal-content input[type="text"], .modal-content input[type="password"] { width: 100%; } /* Inputs no modal 100% */
+         .modal-content textarea { width: calc(100% - 20px); } /* Textarea no modal com padding */
         .close-button { position: absolute; top: 10px; right: 15px; font-size: 24px; font-weight: bold; cursor: pointer; }
         #professorDisciplinesCheckboxes div, #professorClassesCheckboxes div, #editProfessorDisciplinesCheckboxes div, #editProfessorClassesCheckboxes div { margin-bottom: 5px; } /* Adicionado IDs de edição */
         #professorDisciplinesCheckboxes label, #professorClassesCheckboxes label, #editProfessorDisciplinesCheckboxes label, #editProfessorClassesCheckboxes label { margin-left: 5px; font-weight: normal; display: inline-block; margin-right: 10px; } /* Adicionado IDs de edição */
@@ -275,6 +300,17 @@
             font-family: inherit;
             box-sizing: border-box;
          }
+          /* Estilo específico para a célula de observação editável */
+         .editable-cell.observation-cell {
+             text-align: left; /* Alinha o texto da observação à esquerda */
+             min-width: 150px; /* Largura mínima maior */
+         }
+          .editable-cell.observation-cell span {
+              display: block; /* Garante que o span ocupe a linha */
+              white-space: pre-wrap; /* Preserva quebras de linha */
+              word-break: break-word; /* Quebra palavras longas */
+          }
+
 
         /* Estilos para Tabela de Gerenciamento de Usuários */
         #manageUsersSection table {
@@ -336,6 +372,16 @@
               #professorSection table.professor-table td:first-child {
                  text-align: left; /* Nome do aluno alinhado à esquerda */
               }
+              /* Ajuste de largura para a coluna de observação na tabela do professor */
+              #professorSection table.professor-table th:last-child,
+              #professorSection table.professor-table td:last-child {
+                 width: 25%; /* Ajusta largura da última coluna (observação) */
+              }
+                #professorSection table.professor-table td:last-child {
+                   text-align: left; /* Alinha observação à esquerda */
+                }
+
+
 
             /* Footer fixo na aplicação */
             #appFooter {
@@ -364,7 +410,7 @@
             #sidebar, #loginContainer, .modal, .button, input, select, .unitCheckbox, label[for="studentSelectPrint"], label[for="reportType"],
              #searchName, .close-button, th button, td button, #appHeaderText, .login-watermark,
              #loginContainer .senac-title, #manageUsersSection, #manageUsersSection table .button, #manageUsersSection .security-warning,
-             #professorSection select, #professorSection label, #appFooter /* Oculta o footer na impressão */
+             #professorSection select, #professorSection label, #appFooter, #dateTimeDisplay /* Oculta o footer e relógio na impressão */
             { display: none !important; }
 
              #appContainer{ display: block; height: auto; width: 100%; overflow: visible; background-color: #fff !important;}
@@ -376,6 +422,8 @@
              th { background-color: #ddd !important; color: #000 !important; font-weight: bold; }
              td { text-align: center; } /* Garante centralização das células de dados */
              td:first-child { text-align: left; } /* Alinha o nome do aluno à esquerda na tabela */
+              td.observation-cell { text-align: left; } /* Alinha observação à esquerda na impressão */
+              td.observation-cell span { white-space: pre-wrap; } /* Preserva quebras de linha na impressão */
 
 
              /* Controla quebras de página */
@@ -430,6 +478,8 @@
 
     <div id="mainContentArea">
         <div id="appHeaderText">MÉDIOTEC</div>
+        <div id="dateTimeDisplay"></div>
+
 
         <div id="studentManagementSection">
             <h1>Gerenciador de Notas de Boletim</h1>
@@ -499,6 +549,7 @@
                     <option value="D">Desenvolveu (D)</option>
                     <option value="ND">Não Desenvolveu (ND)</option>
                 </select>
+                <input type="text" id="disciplineObservation" placeholder="Observação (Opcional)" style="width: calc(100% - 10px); display: block;">
                 <button type="button" class="button" onclick="addDiscipline()">Adicionar Disciplina</button>
             </div>
 
@@ -526,7 +577,17 @@
             <button type="button" class="button" onclick="printAllReports()">Imprimir Todos os Boletins</button>
             <button type="button" class="button" onclick="printStudentReport()">Imprimir Boletim do Aluno</button>
 
-            <table id="studentTable">
+             <h3>Backup/Restaurar Dados (Manual)</h3>
+            <button type="button" class="button" onclick="exportData()">Exportar Dados (Backup)</button>
+            <div style="margin-top: 10px; border: 1px solid #ccc; padding: 10px; border-radius: 5px;">
+                <p style="margin-top: 0; font-weight: bold;">Importar Dados:</p>
+                <input type="file" id="importFile" accept=".json" style="display:none;">
+                <button type="button" class="button" onclick="document.getElementById('importFile').click()" style="width: auto; display: inline-block; margin: 5px 0;">Selecionar Arquivo</button>
+                <span id="importFileName" style="margin-left: 10px; font-style: italic;">Nenhum arquivo selecionado.</span>
+                <button type="button" class="button delete-button" onclick="importData()" disabled id="performImportButton" style="width: auto; display: inline-block; margin: 5px;">Confirmar Importação (Irá substituir dados atuais!)</button>
+                <p id="importStatus" class="error" style="margin-top: 5px;"></p>
+            </div>
+             <table id="studentTable">
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -539,7 +600,7 @@
                         <th>Avaliação 2</th>
                         <th>Menção Final</th>
                         <th>Situação</th>
-                        <th>Ações</th>
+                        <th>Observação</th> <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -600,7 +661,7 @@
                            <th>Avaliação 2</th>
                            <th>Menção Final</th>
                            <th>Situação</th>
-                      </tr>
+                           <th>Observação</th> </tr>
                   </thead>
                   <tbody>
                        </tbody>
@@ -702,6 +763,9 @@
 <script>
     // --- INÍCIO DO JAVASCRIPT ---
 
+    // Variável para armazenar o ID do intervalo do relógio
+     let dateTimeIntervalId = null;
+
     // Carregar dados do localStorage
     const students = JSON.parse(localStorage.getItem('students')) || [];
 
@@ -734,15 +798,15 @@
     // e que o admin e coordenador hardcoded estejam presentes se o localStorage não os tiver.
     // Isso ajuda a evitar problemas se o localStorage estiver vazio ou corrompido de versões anteriores.
     let needsSave = false;
-    if (!users || !users.admin || !Array.isArray(users.coordinators) || !Array.isArray(users.professors)) {
+    if (!users || typeof users.admin !== 'object' || !Array.isArray(users.coordinators) || !Array.isArray(users.professors)) { // Verifica se users.admin é um objeto
          console.log("localStorage 'users' não encontrado ou incompleto. Inicializando com estrutura padrão.");
          users = initialUsersStructure;
          needsSave = true;
     } else {
-        // Verifica se o admin hardcoded está presente
+        // Verifica se o admin hardcoded está presente pelo username
         if (!users.admin || users.admin.username !== initialUsersStructure.admin.username) {
-             console.log("Admin hardcoded não encontrado no localStorage. Adicionando.");
-             users.admin = initialUsersStructure.admin;
+             console.log("Admin hardcoded não encontrado no localStorage. Adicionando/Substituindo.");
+             users.admin = initialUsersStructure.admin; // Garante que o admin é o hardcoded
              needsSave = true;
         }
          // Verifica se o coordenador hardcoded está presente
@@ -780,6 +844,7 @@
     const studentManagementSection = document.getElementById('studentManagementSection');
     const manageUsersSection = document.getElementById('manageUsersSection');
     const professorSection = document.getElementById('professorSection'); // Referência para a nova seção do professor
+     const dateTimeDisplay = document.getElementById('dateTimeDisplay'); // Referência para o elemento do relógio
 
 
     document.getElementById('loginButton').addEventListener('click', login);
@@ -967,6 +1032,7 @@
          document.getElementById('loginContainer').classList.add('hidden');
          document.getElementById('appContainer').classList.remove('hidden');
          alert(welcomeMessage);
+         startDateTimeDisplay(); // Inicia o relógio ao logar
          setRolePermissions(); // Configura a interface baseada no papel (agora gerencia qual seção mostrar)
      }
 
@@ -984,7 +1050,39 @@
         document.getElementById('username').value = '';
         document.getElementById('password').value = '';
         document.getElementById('loginError').textContent = '';
+         stopDateTimeDisplay(); // Para o relógio ao deslogar
         alert('Você deslogou com sucesso.');
+    }
+
+    // --- Funções do Relógio em Tempo Real ---
+    function updateDateTimeDisplay() {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // Meses são 0-11
+        const year = now.getFullYear();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        dateTimeDisplay.textContent = `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+
+    function startDateTimeDisplay() {
+        // Limpa qualquer intervalo anterior para evitar múltiplos relógios
+        if (dateTimeIntervalId !== null) {
+            clearInterval(dateTimeIntervalId);
+        }
+        updateDateTimeDisplay(); // Atualiza imediatamente ao iniciar
+        dateTimeIntervalId = setInterval(updateDateTimeDisplay, 1000); // Atualiza a cada 1 segundo
+        dateTimeDisplay.classList.remove('hidden'); // Garante que o elemento do relógio está visível
+    }
+
+    function stopDateTimeDisplay() {
+        if (dateTimeIntervalId !== null) {
+            clearInterval(dateTimeIntervalId);
+            dateTimeIntervalId = null;
+        }
+         dateTimeDisplay.classList.add('hidden'); // Oculta o elemento do relógio
     }
 
     function addStudent() {
@@ -1034,11 +1132,12 @@
         const disciplineName = document.getElementById('disciplineSelect').value;
         const unitValue = document.getElementById('unitSelect').value; // Unidade (1, 2, 3)
         const evaluation1 = document.getElementById('evaluation1').value;
-        const evaluation2 = document.getElementById('evaluation2').value;
+        const evaluation2 = document.getElementById('evaluation2').value; // Corrigido para evaluation2
         const finalGrade = document.getElementById('finalGrade').value;
+         const observation = document.getElementById('disciplineObservation').value.trim(); // Pega a observação
 
         if (!studentName || !disciplineName || !unitValue || !evaluation1 || !evaluation2 || !finalGrade) {
-            alert('Por favor, preencha todos os campos da disciplina.');
+            alert('Por favor, preencha todos os campos de nota e menção da disciplina.'); // Mensagem ajustada
             return;
         }
 
@@ -1050,7 +1149,8 @@
                 return;
             }
 
-            student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation1, finalGrade }); // Corrigido: evaluation1 usado 2x, deveria ser evaluation2
+            // Adiciona a observação ao objeto da disciplina
+            student.disciplines.push({ discipline: disciplineName, unit: unitValue, evaluation1, evaluation2, finalGrade, observation: observation || '' }); // Salva a observação, ou string vazia se estiver vazia
             student.disciplines.sort((a,b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit); // Ordenar disciplinas
             localStorage.setItem('students', JSON.stringify(students));
             alert('Disciplina adicionada com sucesso!');
@@ -1066,6 +1166,7 @@
         document.getElementById('evaluation1').value = '';
         document.getElementById('evaluation2').value = '';
         document.getElementById('finalGrade').value = '';
+         document.getElementById('disciplineObservation').value = ''; // Limpa o campo de observação
     }
 
     function deleteStudent(studentName) {
@@ -1178,22 +1279,27 @@
                           actionsHtml = 'N/A';
                       }
 
-                     // Verifica se o professor logado pode editar esta disciplina/turma
-                     const canEditGrades = isProfessor && canProfessorEdit(loggedInProfessor, discipline.discipline, student.class);
+                     // Verifica se o professor logado pode editar esta disciplina/turma (e Admin/Coordenador sempre podem)
+                     const canEditGradesAndObservations = isAdminOrCoordinator || (isProfessor && canProfessorEdit(loggedInProfessor, discipline.discipline, student.class));
 
-                     // Células editáveis para notas/menção se a permissão for concedida
+                     // Células editáveis para notas/menção/observação se a permissão for concedida
                      // Use escape nos valores de data-* para segurança
-                     const evaluation1Cell = canEditGrades ?
+                     const evaluation1Cell = canEditGradesAndObservations ?
                          `<td class="editable-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="evaluation1"><span>${discipline.evaluation1}</span></td>` :
                          `<td>${discipline.evaluation1}</td>`;
 
-                     const evaluation2Cell = canEditGrades ?
+                     const evaluation2Cell = canEditGradesAndObservations ?
                          `<td class="editable-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="evaluation2"><span>${discipline.evaluation2}</span></td>` :
                          `<td>${discipline.evaluation2}</td>`;
 
-                     const finalGradeCell = canEditGrades ?
+                     const finalGradeCell = canEditGradesAndObservations ?
                          `<td class="editable-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="finalGrade"><span>${discipline.finalGrade}</span></td>` :
                          `<td>${discipline.finalGrade}</td>`;
+
+                      // Célula de Observação
+                      const observationCell = canEditGradesAndObservations ?
+                          `<td class="editable-cell observation-cell" data-student="${escape(student.name)}" data-discipline="${escape(discipline.discipline)}" data-unit="${discipline.unit}" data-field="observation"><span>${discipline.observation || ''}</span></td>` :
+                          `<td class="observation-cell"><span>${discipline.observation || ''}</span></td>`;
 
 
                      // Células comuns a todas as linhas de disciplina
@@ -1204,6 +1310,7 @@
                          ${evaluation2Cell}
                          ${finalGradeCell}
                          <td>${getStudentSituation(discipline.finalGrade)}</td>
+                         ${observationCell}
                      `;
 
                      if (index === 0) { // Primeira linha da disciplina para este aluno
@@ -1233,7 +1340,7 @@
              if (oldSpan) {
                  oldSpan.removeEventListener('click', handleClickEditableCell);
              }
-             const oldInput = cell.querySelector('input, select');
+             const oldInput = cell.querySelector('input[type="text"], select'); // Altera para selecionar input[type="text"] ou select
              if (oldInput) {
                   oldInput.removeEventListener('blur', handleBlurEditableCell);
                   oldInput.removeEventListener('change', handleChangeEditableCell);
@@ -1243,6 +1350,15 @@
                         cell.innerHTML = `<span>${oldInput.tagName === 'SELECT' ? oldInput.options[oldInput.selectedIndex].textContent : oldInput.value}</span>`;
                    }
              }
+             // Lidar especificamente com textareas se forem usadas para observação
+             const oldTextarea = cell.querySelector('textarea');
+              if (oldTextarea) {
+                 oldTextarea.removeEventListener('blur', handleBlurEditableCell);
+                 oldTextarea.removeEventListener('keydown', handleKeydownEditableCell);
+                  if (cell.contains(oldTextarea)) {
+                      cell.innerHTML = `<span>${oldTextarea.value}</span>`;
+                  }
+              }
          });
 
          // Adiciona listeners aos elementos span *atuais* dentro das células editáveis
@@ -1261,31 +1377,33 @@
          const studentName = unescape(cell.dataset.student);
          const disciplineName = unescape(cell.dataset.discipline);
          const unitValue = cell.dataset.unit;
-         const field = cell.dataset.field; // evaluation1, evaluation2, or finalGrade
-         const currentValue = span.textContent; // Pega o valor atual do span
+         const field = cell.dataset.field; // evaluation1, evaluation2, finalGrade, or observation
+         const currentValue = span.textContent; // Pega o valor atual do span (ou textarea)
 
          // Verifica se o usuário logado tem permissão para editar esta célula
-         // Seção do Professor: Assume que o professor pode editar as células na SUA tabela
-         // Seção Admin/Coordenador: Assume que apenas professores atribuídos podem editar (já filtrado na renderização da tabela principal)
          const isProfessorTable = cell.closest('table')?.classList.contains('professor-table');
-         let canEdit = false;
-         if (isProfessorTable) {
-              // Na tabela do professor, ele só vê o que pode editar
-              canEdit = true; // Assume que se está na tabela dele, ele pode editar
-         } else {
-              // Na tabela principal, a célula só tem a classe editable-cell se o professor logado puder editar
-              // Então, se a classe existe, assume que pode editar. (Lógica já aplicada em renderStudentTable)
-              canEdit = cell.classList.contains('editable-cell');
-         }
+          const isAdminOrCoordinator = userRole === 'admin' || userRole === 'coordinator';
+         let canEdit = isAdminOrCoordinator; // Admin/Coordinator sempre podem editar
+          if (userRole === 'professor' && currentUser) { // Se for professor, verifica atribuições
+              // Verifica se o professor tem permissão para esta disciplina e turma
+              // Precisa encontrar a turma do aluno para verificar a permissão
+              const student = students.find(s => s.name === studentName);
+               if (student) {
+                  canEdit = canProfessorEdit(currentUser, disciplineName, student.class);
+               } else {
+                   canEdit = false; // Aluno não encontrado, não permite editar
+               }
+          }
+
 
          if (!canEdit) {
               console.log("Usuário sem permissão para editar esta célula."); // DEBUG
-              return; // Não permite edição se o usuário não tem permissão
+              return; // Não permite edição se o usuario não tem permissão
          }
 
 
-         // Evita editar se já está em modo de edição (procura input ou select dentro da célula)
-         if (cell.querySelector('input, select')) {
+         // Evita editar se já está em modo de edição (procura input, select, ou textarea dentro da célula)
+         if (cell.querySelector('input, select, textarea')) {
              return;
          }
 
@@ -1328,17 +1446,33 @@
 
                  inputElement.appendChild(option);
              });
+         } else if (field === 'observation') {
+             // Para Observação, usa um input de texto (poderia ser textarea para mais espaço)
+             inputElement = document.createElement('input');
+             inputElement.type = 'text';
+             inputElement.value = currentValue.trim(); // Usa trim no valor atual
+             // Se quiser usar um textarea:
+             // inputElement = document.createElement('textarea');
+             // inputElement.value = currentValue.trim();
+             // inputElement.style.width = '100%'; // Ajusta largura se for textarea
+             // inputElement.style.boxSizing = 'border-box';
+             // inputElement.style.height = 'auto'; // Ajusta altura automaticamente
+             // inputElement.rows = 2; // Altura inicial em linhas
          }
+
 
          if (inputElement) {
               // Remove o conteúdo atual (span)
               cell.innerHTML = '';
              cell.appendChild(inputElement);
-             inputElement.focus(); // Coloca o foco no input/select
+             inputElement.focus(); // Coloca o foco no input/select/textarea
 
              // Adiciona listeners para salvar a mudança
              inputElement.addEventListener('blur', handleBlurEditableCell);
-             inputElement.addEventListener('change', handleChangeEditableCell); // Captura a mudança para selects
+             // O evento 'change' é bom para selects. Para inputs/textareas, 'blur' ou 'input' são mais comuns.
+             if (inputElement.tagName === 'SELECT') {
+                  inputElement.addEventListener('change', handleChangeEditableCell);
+             }
              inputElement.addEventListener('keydown', handleKeydownEditableCell); // Para salvar com Enter
          }
      }
@@ -1351,7 +1485,7 @@
          const disciplineName = unescape(cell.dataset.discipline);
          const unitValue = cell.dataset.unit;
          const field = cell.dataset.field;
-         const newValue = inputElement.value; // O valor selecionado (D ou ND, A, PA, ND, ou vazio '')
+         const newValue = inputElement.value.trim(); // Usa trim para inputs de texto/textarea
 
          // Evita salvar se o input/select já foi removido por outro evento (como Enter)
          if (!cell.contains(inputElement)) {
@@ -1379,10 +1513,14 @@
                      const row = cell.closest('tr');
                      if(row) {
                           // The situation cell is the one after the final grade cell in the professor table structure
-                          const situationCell = cell.nextElementSibling;
-                          if (situationCell) {
-                             situationCell.textContent = getStudentSituation(newValue);
-                          }
+                          // Find the situation cell dynamically as the order might vary slightly
+                           const cells = Array.from(row.querySelectorAll('td'));
+                           const fieldIndex = Array.from(cell.parentElement.querySelectorAll('td')).indexOf(cell); // Find index of the current cell
+                            // Assuming situation is always after finalGrade
+                           if (field === 'finalGrade' && fieldIndex !== -1 && fieldIndex < cells.length -1) {
+                                const situationCell = cells[fieldIndex + 1];
+                                situationCell.textContent = getStudentSituation(newValue);
+                           }
                      }
                  } else {
                      // If in the main table, re-render the whole table
@@ -1397,9 +1535,9 @@
               // Para selects, mostra o texto da opção selecionada
               const displayValue = inputElement.tagName === 'SELECT'
                  ? inputElement.options[inputElement.selectedIndex].textContent
-                 : newValue;
+                 : newValue; // Para inputs/textareas, mostra o novo valor
 
-              cell.innerHTML = `<span>${displayValue}</span>`;
+              cell.innerHTML = `<span>${displayValue || ''}</span>`; // Mostra string vazia se o valor for vazio
 
              // Re-anexa os listeners nas células editáveis da tabela ATUAL (principal ou professor)
              // Chama attachInlineEditingEvents() para re-anexar em todas as células editáveis da DOM.
@@ -1427,11 +1565,22 @@
 
      // Handler para salvar com a tecla Enter em inputs (e selects, embora menos comum)
      function handleKeydownEditableCell(event) {
-          if (event.key === 'Enter') {
+          // Salvar com Enter funciona apenas para inputs de texto/textarea
+          if (event.key === 'Enter' && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) {
              event.preventDefault(); // Evita que o Enter cause submit ou outra ação padrão
              // Chama o handler de blur para salvar, garantindo que o valor mais recente seja usado
              event.target.blur();
           }
+          // Para textarea, Shift+Enter pode ser usado para adicionar nova linha
+          if (event.key === 'Enter' && event.shiftKey && event.target.tagName === 'TEXTAREA') {
+               // Permite a quebra de linha padrão para Shift+Enter em textarea
+               return;
+          }
+           // Se for apenas Enter em TEXTAREA sem Shift, trate como Enter (salvar)
+           if (event.key === 'Enter' && event.target.tagName === 'TEXTAREA') {
+               event.preventDefault(); // Previne a quebra de linha padrão
+               event.target.blur(); // Salva
+           }
      }
 
 
@@ -1489,256 +1638,132 @@
         renderStudentTable(filtered);
     }
 
-    // --- Função para Imprimir TODOS os Boletins (ATUALIZADA) ---
-    function printAllReports() {
-        const allStudents = students; // Pega todos os alunos
+    // Function to export data to a JSON file
+    function exportData() {
+        const data = {
+            students: students, // Global students array
+            users: users // Global users object
+        };
+        const jsonData = JSON.stringify(data, null, 2); // Use 2 spaces for indentation
+        const blob = new Blob([jsonData], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mediotec_data_backup.json'; // Default file name
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Clean up the object URL
+        alert('Dados exportados com sucesso!');
+    }
 
-        if (allStudents.length === 0) {
-            alert('Nenhum aluno cadastrado para imprimir.');
+    // Function to import data from a JSON file
+    function importData() {
+        const fileInput = document.getElementById('importFile');
+        const importStatus = document.getElementById('importStatus');
+        const performImportButton = document.getElementById('performImportButton');
+        importStatus.textContent = ''; // Clear previous messages
+
+        if (fileInput.files.length === 0) {
+            importStatus.textContent = 'Por favor, selecione um arquivo para importar.';
             return;
         }
 
-        let allReportsContent = '';
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-        allStudents.forEach(student => {
-            // Gera o conteúdo do boletim para cada aluno, incluindo todas as unidades (1, 2, 3)
-            const studentUnits = ['1', '2', '3'];
-            const filteredDisciplines = student.disciplines.filter(d => studentUnits.includes(d.unit));
-            const sortedDisciplines = [...filteredDisciplines].sort((a, b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit);
+        reader.onload = (event) => {
+            try {
+                const importedData = JSON.parse(event.target.result);
 
-            let studentTableContent = `
-                <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                    <thead>
-                        <tr>
-                            <th>Disciplina</th>
-                            <th>Unidade</th>
-                            <th>Avaliação 1</th>
-                            <th>Avaliação 2</th>
-                            <th>Menção Final</th>
-                            <th>Situação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
+                // Basic validation: Check if the structure looks somewhat correct
+                if (!importedData || !Array.isArray(importedData.students) || !importedData.users || !Array.isArray(importedData.users.coordinators) || !Array.isArray(importedData.users.professors) || typeof importedData.users.admin !== 'object') { // Check for admin object type
+                    throw new Error('Estrutura de dados inválida no arquivo JSON.');
+                }
 
-            if (sortedDisciplines.length === 0) {
-                studentTableContent += `<tr><td colspan="6">Nenhuma disciplina cadastrada.</td></tr>`;
-            } else {
-                sortedDisciplines.forEach(discipline => {
-                    studentTableContent += `
-                        <tr>
-                            <td>${discipline.discipline}</td>
-                            <td>${discipline.unit}</td>
-                            <td>${discipline.evaluation1}</td>
-                            <td>${discipline.evaluation2}</td>
-                            <td>${discipline.finalGrade}</td>
-                            <td>${getStudentSituation(discipline.finalGrade)}</td>
-                        </tr>
-                    `;
-                });
+                // Ask for confirmation before overwriting
+                if (confirm('ATENÇÃO: A importação substituirá a maioria dos dados atuais de Alunos e Usuários (Professores/Coordenadores). O usuário administrador principal será mantido.\nDeseja continuar?')) {
+
+                     // Preserve the hardcoded admin during import
+                     // Ensure we use the initial structure's admin, not whatever might be in the imported file
+                     importedData.users.admin = initialUsersStructure.admin; // Use the original hardcoded admin
+
+
+                     // Merge logic for other users: Keep users from current storage if they are NOT in the imported data
+                     // This prevents losing newly added users (coordinators/professors) if importing an old backup
+                     const importedUsernames = [
+                          importedData.users.admin.username, // Include admin username
+                         ...importedData.users.coordinators.map(u => u.username), // Include imported coordinator usernames
+                         ...importedData.users.professors.map(u => u.username) // Include imported professor usernames
+                     ];
+
+                     // Filter current coordinators, keeping only those whose username is NOT in the imported list
+                     const currentCoordinatorsToKeep = users.coordinators.filter(uc => !importedUsernames.includes(uc.username));
+                      // Filter current professors, keeping only those whose username is NOT in the imported list
+                     const currentProfessorsToKeep = users.professors.filter(up => !importedUsernames.includes(up.username));
+
+                     // Add the kept current users to the imported data structure
+                     importedData.users.coordinators.push(...currentCoordinatorsToKeep);
+                     importedData.users.professors.push(...currentProfessorsToKeep);
+
+
+                    // Replace global data with imported data
+                    students.length = 0; // Clear existing students array
+                    students.push(...importedData.students); // Add imported students
+                    users = importedData.users; // Replace the users object with the potentially merged structure
+
+
+                    // Save to localStorage
+                    localStorage.setItem('students', JSON.stringify(students));
+                    localStorage.setItem('users', JSON.stringify(users));
+
+                    alert('Dados importados com sucesso! O sistema será recarregado para aplicar as mudanças.');
+                    // Reload the page to ensure all parts of the app load data from the new localStorage content
+                    location.reload();
+
+                } else {
+                    importStatus.textContent = 'Importação cancelada.';
+                    // Clear the file input and disable the button after cancel
+                    fileInput.value = '';
+                     document.getElementById('importFileName').textContent = '';
+                     performImportButton.disabled = true;
+                }
+
+            } catch (e) {
+                importStatus.textContent = 'Erro ao ler ou processar o arquivo: ' + e.message;
+                console.error('Erro durante importação:', e);
+                 // Clear the file input and disable the button on error
+                 fileInput.value = '';
+                 document.getElementById('importFileName').textContent = '';
+                 performImportButton.disabled = true;
             }
+        };
 
-            studentTableContent += `
-                    </tbody>
-                </table>
-            `;
+        reader.onerror = () => {
+            importStatus.textContent = 'Erro ao ler o arquivo.';
+             // Clear the file input and disable the button on reader error
+             fileInput.value = '';
+             document.getElementById('importFileName').textContent = '';
+             performImportButton.disabled = true;
+        };
 
-            // Adiciona o relatório deste aluno ao conteúdo geral
-            allReportsContent += `
-                <div class="student-report" style="margin-bottom: 40px; page-break-after: always;">
-                     <div style="text-align: center; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 1px solid #ccc;">
-                        <h2 style="color: #000 !important; border-bottom: none; margin: 0; padding: 0; font-size: 14pt;">Senac Paulista - Boletim do Aluno - MÉDIOTEC</h2>
-                        <p style="margin: 2px 0; font-size: 10pt;"><strong>Nome:</strong> ${student.name}</p>
-                        <p style="margin: 2px 0; font-size: 10pt;"><strong>Curso:</strong> ${student.course}</p>
-                        <p style="margin: 2px 0; font-size: 10pt;"><strong>Turma:</strong> ${student.class} - <strong>Turno:</strong> ${student.unit}</p>
-                     </div>
-                     ${studentTableContent}
-                </div> `;
-        });
-
-
-        // Cria uma nova janela para a impressão e escreve o conteúdo gerado
-        const printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Boletins - MÉDIOTEC</title>
-                <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 1.5cm; color: #000; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                    th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 10pt; }
-                    th { background-color: #ddd; font-weight: bold; }
-                    h1, h2, h3 { color: #000; page-break-after: avoid; }
-                     .student-report { page-break-inside: avoid; page-break-after: always; margin-bottom: 40px; padding: 10px 0; } /* Garante que o bloco de relatório fique junto e force quebra depois */
-                     .student-report:last-child { page-break-after: avoid; margin-bottom: 0; } /* Não força quebra depois do último relatório */
-
-                    @media print {
-                        body { margin: 0; padding: 1.5cm; } /* Use padding instead of margin on body for better control */
-                        @page { size: A4; margin: 0; } /* Set margin to 0 on @page and use padding on body */
-                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                        /* Ensure table elements do not break across pages */
-                        table, tr, td, th { page-break-inside: avoid !important; }
-                         .student-report { page-break-inside: avoid !important; page-break-after: always !important; margin-bottom: 0 !important; padding: 10px 0 !important; } /* !important para garantir no print */
-                        .student-report:last-child { page-break-after: avoid !important; } /* No break after the last one */
-                        h2 { margin-top: 0 !important; padding-top: 0 !important; } /* Ajuste de espaço no cabeçalho */
-                         p { margin: 2px 0 !important; } /* Compact paragraph spacing */
-                         th, td { padding: 6px !important; font-size: 9pt !important;} /* Ajuste fino no padding/fonte da tabela para caber mais info */
-                    }
-                </style>
-            </head>
-            <body>${allReportsContent}</body>
-            </html>
-        `);
-        printWindow.document.close();
-        printWindow.print();
-        // printWindow.close(); // Opcional: fechar a janela após imprimir
+        reader.readAsText(file); // Read the selected file as text
     }
 
-
-    // --- Função para Imprimir Boletim de UM Aluno (ATUALIZADA com base nos ajustes de impressão) ---
-    function printStudentReport() {
-         const studentName = document.getElementById('studentSelectPrint').value;
-         const selectedUnits = Array.from(document.querySelectorAll('.unitCheckbox:checked')).map(cb => cb.value);
-         const reportType = document.querySelector('input[name="reportType"]:checked').value; // 'full' or 'summary'
-
-         if (!studentName) {
-             alert('Por favor, selecione um aluno para imprimir.');
-             return;
-         }
-         if (selectedUnits.length === 0) {
-             alert('Por favor, selecione pelo menos uma unidade para imprimir.');
-             return;
-         }
-
-         const student = students.find(s => s.name === studentName);
-         if (!student) {
-             alert('Erro: Aluno não encontrado.');
-             return;
-         }
-
-         // Gera o conteúdo HTML para impressão
-         let printContent = `
-            <div class="student-report">
-                 <div style="text-align: center; margin-bottom: 20px;">
-                    <h2 style="color: #000 !important; border-bottom: none; margin: 0; padding: 0; font-size: 14pt;">Senac Paulista - Boletim do Aluno - MÉDIOTEC</h2>
-                    <p style="margin: 2px 0; font-size: 10pt;"><strong>Nome:</strong> ${student.name}</p>
-                    <p style="margin: 2px 0; font-size: 10pt;"><strong>Curso:</strong> ${student.course}</p>
-                    <p style="margin: 2px 0; font-size: 10pt;"><strong>Turma:</strong> ${student.class} - <strong>Turno:</strong> ${student.unit}</p>
-                 </div>
-         `;
-
-         const filteredDisciplines = student.disciplines.filter(d => selectedUnits.includes(d.unit));
-         const sortedDisciplines = [...filteredDisciplines].sort((a, b) => a.discipline.localeCompare(b.discipline) || a.unit - b.unit);
-
-
-         printContent += `
-             <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-                 <thead>
-                     <tr>
-                         <th>Disciplina</th>
-                         <th>Unidade</th>
-                         ${reportType === 'full' ? '<th>Avaliação 1</th><th>Avaliação 2</th>' : ''}
-                         <th>Menção Final</th>
-                         <th>Situação</th>
-                     </tr>
-                 </thead>
-                 <tbody>
-         `;
-
-         if (sortedDisciplines.length === 0) {
-             printContent += `<tr><td colspan="${reportType === 'full' ? 5 : 3}">Nenhuma disciplina encontrada para as unidades selecionadas.</td></tr>`;
-         } else {
-              sortedDisciplines.forEach(discipline => {
-                 printContent += `
-                     <tr>
-                         <td>${discipline.discipline}</td>
-                         <td>${discipline.unit}</td>
-                         ${reportType === 'full' ? `<td>${discipline.evaluation1}</td><td>${discipline.evaluation2}</td>` : ''}
-                         <td>${discipline.finalGrade}</td>
-                         <td>${getStudentSituation(discipline.finalGrade)}</td>
-                     </tr>
-                 `;
-             });
-         }
-
-
-         printContent += `
-                 </tbody>
-             </table>
-             </div> `;
-
-         // Cria uma nova janela ou iframe para a impressão
-         const printWindow = window.open('', '_blank');
-         printWindow.document.write(`
-             <html>
-             <head>
-                 <title>Boletim de ${student.name}</title>
-                 <style>
-                     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 1.5cm; color: #000; }
-                     table { width: 100%; border-collapse: collapse; margin-top: 10px; } /* Margem menor no topo da tabela */
-                     th, td { border: 1px solid #000; padding: 8px; text-align: center; font-size: 10pt; }
-                     th { background-color: #ddd; font-weight: bold; }
-                     h1, h2, h3 { color: #000; page-break-after: avoid; }
-                     .student-report { page-break-inside: avoid; } /* Garante que o relatório de 1 aluno não quebre */
-
-                     @media print {
-                         body { margin: 0; padding: 1.5cm; } /* Use padding em vez de margin no body */
-                         @page { size: A4; margin: 0; } /* Margem zero no @page */
-                          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } /* Para imprimir cores de fundo */
-                          /* Ensure table elements do not break across pages */
-                         table, tr, td, th { page-break-inside: avoid !important; }
-                          h2 { margin-top: 0 !important; padding-top: 0 !important; } /* Ajuste de espaço no cabeçalho */
-                          p { margin: 2px 0 !important; } /* Espaçamento compacto para parágrafos */
-                           th, td { padding: 6px !important; font-size: 9pt !important;} /* Ajuste fino no padding/fonte da tabela */
-                     }
-                 </style>
-             </head>
-             <body>${printContent}</body>
-             </html>
-         `);
-         printWindow.document.close();
-         printWindow.print();
-     }
-
-
-    function renderStudentSelect() {
-        const studentSelect = document.getElementById('studentSelect');
-        const currentVal = studentSelect.value; // Salvar valor atual se houver
-        studentSelect.innerHTML = '<option value="">Selecione o Aluno</option>';
-        // Só popula o select para adicionar disciplina se for Admin ou Coordenador
-        if (userRole === 'admin' || userRole === 'coordinator') {
-            students.forEach(student => {
-                const option = document.createElement('option');
-                option.value = student.name;
-                option.textContent = `${student.name} (${student.class} - ${student.unit})`; // Nome + Turma + Turno
-                studentSelect.appendChild(option);
-            });
+    // Event listener for file input change to show file name and enable import button
+    document.getElementById('importFile').addEventListener('change', function() {
+        const importFileNameSpan = document.getElementById('importFileName');
+        const performImportButton = document.getElementById('performImportButton');
+        if (this.files.length > 0) {
+            importFileNameSpan.textContent = `Arquivo selecionado: ${this.files[0].name}`;
+            performImportButton.disabled = false; // Enable the import button
+            document.getElementById('importStatus').textContent = ''; // Clear any previous status message
+        } else {
+            importFileNameSpan.textContent = 'Nenhum arquivo selecionado.';
+            performImportButton.disabled = true; // Disable the import button if no file
+             document.getElementById('importStatus').textContent = '';
         }
-        studentSelect.value = currentVal; // Restaura valor se possível
-    }
-
-    function renderStudentSelectPrint() {
-        const studentSelectPrint = document.getElementById('studentSelectPrint');
-        const currentVal = studentSelectPrint.value;
-        studentSelectPrint.innerHTML = '<option value="">Selecione o Aluno</option>';
-        students.forEach(student => {
-            const option = document.createElement('option');
-            option.value = student.name;
-            option.textContent = `${student.name} (${student.class} - ${student.unit})`;
-            studentSelectPrint.appendChild(option);
-        });
-         studentSelectPrint.value = currentVal;
-    }
-
-    function searchStudent() {
-        const searchName = document.getElementById('searchName').value.toLowerCase();
-        if (!searchName) {
-            renderStudentTable(students); // Se a busca estiver vazia, mostra todos
-            return;
-        }
-        const filtered = students.filter(student => student.name.toLowerCase().includes(searchName));
-        renderStudentTable(filtered);
-    }
+    });
 
 
     // --- Funções do Modal de Adicionar Professor ---
@@ -2244,16 +2269,15 @@
              return;
          }
 
-         // Filtra alunos com base na turma SELECIONADA, turno SELECIONADO E se TÊM a disciplina SELECIONADA para a unidade SELECIONADA
+         // Filtra alunos com base na turma SELECIONADA e se TÊM a disciplina SELECIONADA para a unidade SELECIONADA
          const filteredStudents = students.filter(student =>
              student.class === selectedClass && // O aluno está na turma selecionada?
-             student.unit === student.unit && // Verifica o turno do aluno (deve ser o mesmo do aluno no registro)
              student.disciplines.some(d => d.discipline === selectedDiscipline && d.unit === selectedUnit) // O aluno tem a disciplina selecionada para a unidade selecionada?
          );
 
          if (filteredStudents.length === 0) {
              // Nenhum aluno encontrado que corresponda aos critérios
-              professorNoStudentsMessage.textContent = `Nenhum aluno encontrado na turma "${selectedClass}" do turno "${selectedUnit}" com a disciplina "${selectedDiscipline}" cadastrada.`;
+              professorNoStudentsMessage.textContent = `Nenhum aluno encontrado na turma "${selectedClass}" com a disciplina "${selectedDiscipline}" na unidade "${selectedUnit}".`; // Mensagem ajustada
               professorNoStudentsMessage.classList.remove('hidden');
               professorStudentTable.classList.add('hidden');
              return;
@@ -2275,20 +2299,27 @@
                  const studentNameEscaped = escape(student.name);
                  const disciplineNameEscaped = escape(disciplineEntry.discipline);
 
+                 // Células editáveis para notas/menção/observação
+                  // Verifica a permissão para editar
+                  const canEdit = userRole === 'professor' && currentUser && canProfessorEdit(currentUser, selectedDiscipline, selectedClass);
+
+
                  row.innerHTML = `
                      <td>${student.name}</td>
                      <td>${student.course}</td>
-                     <td>${student.unit}</td> <td class="editable-cell" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="evaluation1"><span>${disciplineEntry.evaluation1}</span></td>
-                     <td class="editable-cell" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="evaluation2"><span>${disciplineEntry.evaluation2}</span></td>
-                     <td class="editable-cell" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="finalGrade"><span>${disciplineEntry.finalGrade}</span></td>
-                     <td>${getStudentSituation(disciplineEntry.finalGrade)}</td>
+                     <td>${student.unit}</td> <td class="editable-cell ${canEdit ? '' : 'non-editable'}" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="evaluation1"><span>${disciplineEntry.evaluation1 || ''}</span></td>
+                     <td class="editable-cell ${canEdit ? '' : 'non-editable'}" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="evaluation2"><span>${disciplineEntry.evaluation2 || ''}</span></td>
+                     <td class="editable-cell ${canEdit ? '' : 'non-editable'}" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="finalGrade"><span>${disciplineEntry.finalGrade || ''}</span></td>
+                     <td>${getStudentSituation(disciplineEntry.finalGrade || '')}</td> <td class="editable-cell observation-cell ${canEdit ? '' : 'non-editable'}" data-student="${studentNameEscaped}" data-discipline="${disciplineNameEscaped}" data-unit="${disciplineEntry.unit}" data-field="observation"><span>${disciplineEntry.observation || ''}</span></td>
                  `;
                  professorStudentTableBody.appendChild(row);
              }
          });
 
-         // Anexa os eventos de edição inline às células nesta tabela
-         attachInlineEditingEvents(); // Chama para re-anexar em todas as células editáveis da DOM (seguro)
+         // Anexa os eventos de edição inline APENAS nas células editáveis
+         // O seletor .editable-cell já filtra aquelas que tem a classe.
+         // Se a classe 'non-editable' for aplicada, o clique não levará à criação do input/select.
+         attachInlineEditingEvents();
      }
 
 
@@ -2326,11 +2357,11 @@
           studentManagementSection.classList.add('hidden');
           manageUsersSection.classList.add('hidden');
           professorSection.classList.add('hidden');
+          dateTimeDisplay.classList.add('hidden'); // Oculta o relógio na tela de login
 
           populateClassSelect(); // Popula o select de turmas no formulário de adicionar aluno ao carregar
 
-          // A seção de gerenciamento de alunos é visível por padrão no HTML, mas o appContainer está oculto.
-          // A visibilidade da seção de alunos/usuários/professor é controlada após o login em finalizeLogin/setRolePermissions.
+          // O relógio será iniciado em finalizeLogin()
 
      });
 

@@ -961,8 +961,8 @@
     // Mapping classes to fixed shifts AND courses
     const classInfoMap = {
         '1A': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
-        '1B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
-        '1C': { unit: 'Tarde', course: 'Médio Técnico Desenvolvimento de Jogos' },
+        '1B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Jogos' },
+        '1C': { unit: 'Tarde', course: 'Médio Técnico Desenvolvimento de Sistemas' },
         '2A': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
         '2B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
         '3A': { unit: 'Tarde', course: 'Médio Técnico Informática' }

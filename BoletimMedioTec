@@ -852,29 +852,7 @@
     // In a real system, you'd load this data from a persistent source.
     let students = [
         // Example data structure for a student with disciplines and grades/observations
-        {
-            id: 's1', // Unique student ID
-            name: 'Aluno Exemplo Um',
-            course: 'Médio Técnico Desenvolvimento de Sistemas', // Curso fixo pela turma
-            class: '1A', // Updated class
-            unit: 'Manhã', // Turno fixo pela turma
-            disciplines: [
-                { discipline: 'Matemática', unit: 1, eval1: 'A', eval2: 'PA', finalGrade: 'D', situation: 'Aprovado', observation: 'Ótimo desempenho na primeira unidade.' },
-                { discipline: 'Português', unit: 1, eval1: 'PA', eval2: 'ND', finalGrade: 'ND', situation: 'Reprovado', observation: 'Precisa melhorar na interpretação de texto.' },
-                 { discipline: 'Matemática', unit: 2, eval1: 'A', eval2: 'A', finalGrade: 'D', situation: 'Aprovado', observation: '' },
-            ]
-        },
-         {
-            id: 's2',
-            name: 'Aluno Exemplo Dois',
-            course: 'Médio Técnico Desenvolvimento de Sistemas', // Curso fixo pela turma
-            class: '2B', // Updated class
-            unit: 'Manhã', // Turno fixo pela turma
-            disciplines: [
-                { discipline: 'Matemática', unit: 1, eval1: 'ND', eval2: 'ND', finalGrade: 'ND', situation: 'Reprovado', observation: 'Muita dificuldade com a matéria.' },
-                 { discipline: 'Física', unit: 1, eval1: 'A', eval2: 'A', finalGrade: 'D', situation: 'Aprovado', observation: 'Excelente participação em aula.' },
-            ]
-        }
+        
         // ... add more students here
     ];
 

@@ -826,198 +826,221 @@
 </div>
 </div>
 <script>
-    // --- DATA SIMULATION IN MEMORY (Replace with Local Storage or Backend) ---
-    // This is a basic structure for demonstration.
-    // In a real system, you'd load this data from a persistent source.
-    let students = [
-        // Example data structure for a student with disciplines and grades/observations
+    // --- DATA STORAGE IN MEMORY ---
+    // These arrays hold the application data while the page is open.
+    let students = [];
+    let users = [];
+    let currentUser = null; // Currently logged in user
 
-        // ... add more students here
-    ];
-
-    // Add the new students provided by the user
-    const newStudentsList1A = [
-        "Alice Souza Cavalcanti", "Ana Luisa Trajano Fragoso", "Anna Jullia Cabral da Silva",
-        "Davi Fenelon Mendonça da Silva", "Fernando Vinicius Serejo de Melo", "Gabriel Artur Lima da Silva",
-        "Gabriel de Souza Alencar", "Gabriel Vinicius Nazareth de Melo", "Gabrielly Maria da Silva Oliveira",
-        "Giovanna Dias Sales do Nascimento", "Guilherme Barbosa Alcântara", "Guilherme Viana Guedes Nunes",
-        "Heloisa Maria do Carmo Santos", "Henrique Rodrigues Ulisses", "Hivison Yan Pereira de Oliveira",
-        "Ikaro Vinícius Gomes de Abreu", "Isabel Cristina Vital da Silva Nascimento", "Julia Carlos Picchetto",
-        "Leonardo Vasconcelos Santana", "Leticia Xavier da Silva", "Marcos Cavalcanti de Freitas Lima",
-        "Maria Laura Alves da Silva", "Maria Luiza Gomes Felix", "Matheus Josias de França Caitano",
-        "Miguel Bispo de Almeida", "Miguel Rodrigues Souza de Lima", "Milena Maria Andrade de Lima",
-        "Nicolas Gabriel de Oliveira Muniz", "Otávio Xavier de Amorim Fontes", "Pedro Luiz Barbosa Generoso",
-        "Rayner Victor Silva de Rezende Filho", "Richard Lima Nascimento de Melo", "Yasmin de França Medeiros"
-    ];
-
-     const newStudentsList1B = [
-         'Álvaro Martins Moraes', 'Anderson Marcelino dos Santos', 'Anna Luiza Vicente de Castro Lira',
-         'Arthur Brunno dos Santos Silva', 'Arthur Guilherme de Andrade Barros', 'Caylane Maria Rodrigues de Souza',
-         'Clara Beatriz Viana Souza Pinto', 'Davi Cruz Correia Lima', 'Eduardo Bezerra Souto Maior Mendes',
-         'Ellen Vitória Pessoa da Silva', 'Gabriel Araújo de França', 'Guilherme Vinhaes de Matos',
-         'Isabelle Miranda Moreira', 'Israel Ricardo de Araujo Lõbo', 'Izadhora Luíza Dias Pródigo',
-         'Jorge Henrique da Silva', 'Julia Isabella Bezerra de Fraga', 'Júlia Letícia do Nascimento da Silva',
-         'Karen Lorena da Cunha Souza', 'Lucas da Silva Resende', 'Marcelo José Bomfim Neto',
-         'Marcos Yuri Gadelha Araújo', 'Maria Clara Bezerra Reis', 'Maria Eduarda Araújo Nascimento',
-         'Maria Eduarda Rodrigues Barreto', 'Maria Letícia Góes Azevedo', 'Marina Gabriele de Andrade Rego',
-         'Matheus Dias Correia de Assunção', 'Murilo de Lima Rodrigues', 'Pedro Gabriel Farias de Arruda Guedes',
-         'Ruan Zaquel Sena da Silva', 'Samara Maciel Cabral de Melo'
-     ];
-
-     const newStudentsList1C = [
-         'Alice Giulianna dos Santos Alves', 'Arthur Brito Solano Guerra de Oliveira', 'Caua Leonardo Santos Ferreira de Sena',
-         'Cláudio Gusmão Ramos Neto', 'David Romão Gomes dos Passos', 'Emily Larissa Pereira da Silva',
-         'Estefany Guedes Carvalho', 'Evilin Nayara Gomes da Silva', 'Harison Cleyton Fernandes do Nascimento',
-         'Heitor Assunção Monteiro', 'Izaias Elias Chagas Neto', 'Jefferson Luan Silva de Paula',
-         'João Daniel Bernardo de Santana Oliveira', 'João Pedro da SilvaEm Processo', 'Jullia Hadassa Araujo de Oliveira',
-         'Kaike Eduardo Morozini de Bastos', 'Kauã Felipe Oliveira da Silva', 'Larissa Lopes Belo da Silva',
-         'Livia Ferreira Nunes', 'Luís Guilherme Ventura Alves', 'Maria Clara da Silva Clemente',
-         'Maria Eduarda de Brito Rodrigues', 'Maria Eduarda Farias Chaves Lopes', 'Maria Fernanda Oliveira Costa',
-         'Maria Klara Alves Cavalcante', 'Maria Luiza Braz Mendes', 'Mateus Marinho Espíndola',
-         'Nicolas Gabriel Bezerra dos Santos Souza', 'Rianne de Almeida Romao', 'Samuell Moises Pereira da Silva',
-         'Thays Camila da Silva Santos', 'Vinicios Bezerra da Silva', 'Wandersson Alves Cavalcante',
-         'William Alves de Freitas'
-     ];
-
-     const newStudentsList2A = [
-         'Cibele Guerra Medeiros', 'Davi Nascimento Martins', 'Deborah Leão Marques Machado',
-         'Erick Cauã Ferreira Rodrigues Figueredo', 'Gabriel Elias Rangel', 'Gleiciane Júlia Vieira do Nascimento',
-         'Ivan Freire de Araújo Neto', 'Joao Henrique Oliveira Gonçalves', 'Joao Vitor Sousa Ramos',
-         'Juan Gomes Rodrigues', 'Leticia de Santana Lins', 'Letícia Maria Augusto de Souza Galvão',
-         'Luckas Alexandre Oliveira Castro Barros', 'Luna Ariela Carvalho de Deus', 'Matheus de Andrade Cordeiro Malafaia Gomes',
-         'Matheus Henrique Ferreira da Silva', 'Maxwell Bernardo Eulálio Pereira Cavalcante', 'Pedro Vinicius de Souza Cavalcanti',
-         'Pietro Cauê da Silva Santos', 'Renato Alves Ribeiro de Oliveira', 'Suzanny Moura de Barros',
-         'Talles Renan Melo de Souza Lira', 'Thayná Valença Albuquerque', 'Victor Gabriel Pereira de Lima',
-         'Vinicius Novaes Silva'
-     ];
-
-     const newStudentsList2B = [
-         'Adricia Naine Costa Bandeira Ferreira', 'Airton Samuel Rodrigues Costa', 'Bruno Rafael Silva Costa',
-         'Caio Cesar Silva Melo', 'Caio Muller Silva da Rocha', 'Daniel Henrique José dos Santos',
-         'Davi Felix MarinhoEm', 'Diógenes Luiz Freitas Batista', 'Eduardo Passos de Andrade',
-         'Gabriela Lima Alexandrino', 'Geovana Noemi Ferreira Moura', 'Guilherme José Rodrigues de Freitas',
-         'Ingrid Cristina Rodrigues Ventura de Araújo', 'João Henrique Santana Cunha', 'Layza Cristina Melo Santos',
-         'Ligia Vitoria Linhares do Nascimento', 'Lucas Miguel Barbosa da Silva', 'Luiz Henrique dos Santos',
-         'Marcos Vasconcelos Dencker Beltrão', 'Maria Carolina Franco de Lima Leite', 'Maria Manuela Helena da Silva',
-         'Matheus Vínicius Aguiar da Silva', 'Pedro Henrique Moura Nascimento da Silva', 'Pedro Henrique Ribeiro de Assumpção',
-         'Pedro Ivo Ribeiro da Cunha', 'Pedro Vinicius Barbosa de Oliveira', 'Sidney Sabino de Lima Junior'
-     ];
-
-     const newStudentsList3A = [ // New list for 3A
-        'Alliny Santos de Albuquerque', 'Anna Bianca de Moraes Almeida Castro', 'Arthur Emmanuel França Aquino de Medeiros',
-        'Carlos Eduardo Bezerra de Santana', 'Clarice Araújo Soares Couto', 'Emily Cristiane Mesquita de Almeida',
-        'Filipe Emanuel Lins do Nascimento Silva', 'Guilherme Tomaz Paiva de Aquino', 'Iury Gabriel Barreto',
-        'Lara Lins de Oliveira', 'Leandro Henrique Carvalho Correia', 'Leticia Chaprão Aureliano de Souza',
-        'Leticia Ellen Ximenes', 'Letícia Marques de Lima Campos', 'Lucas Bandeira de Melo Torres Sena',
-        'Marcello Henrique da Silva Barros', 'Maria Clara Oliveira Sarinho de Melo', 'Maria Eduarda Soares de Albuquerque',
-        'Maria Livia Costa de Oliveira Silva', 'Marina Rodrigues de Lima', 'Mateus Araujo de Oliveira Santos',
-        'Samara Marinho Pereira Roberto', 'Victor Antonio Santana de Lima', 'Yasmin Lopes Mendes'
-    ];
-
-
-    // Mapping classes to fixed shifts AND courses
-    const classInfoMap = {
-        '1A': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
-        '1B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Jogos' },
-        '1C': { unit: 'Tarde', course: 'Médio Técnico Desenvolvimento de Sistemas' },
-        '2A': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
-        '2B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
-        '3A': { unit: 'Tarde', course: 'Médio Técnico Informática' }
-    };
-
-    // Function to get class info (shift and course) based on class name
-    function getClassInfo(className) {
-        return classInfoMap[className] || { unit: 'Desconhecido', course: 'Desconhecido' }; // Default if class not mapped
+    // --- Local Storage Persistence Functions ---
+    // Saves the current state of students and users to Local Storage.
+    function saveData() {
+        try {
+            localStorage.setItem('students', JSON.stringify(students));
+            localStorage.setItem('users', JSON.stringify(users));
+            console.log('Data saved to Local Storage.');
+        } catch (e) {
+            console.error('Error saving data to Local Storage:', e);
+            // Optionally, show a user-friendly message about storage issues.
+        }
     }
 
+    // Loads data from Local Storage on application start.
+    // If no data is found, initializes with default data.
+    function loadData() {
+        try {
+            const savedStudents = localStorage.getItem('students');
+            const savedUsers = localStorage.getItem('users');
 
-    // Add students from the first list to class 1A
-    newStudentsList1A.forEach((studentName, index) => {
-        const classInfo = getClassInfo('1A');
-        students.push({
-            id: 's' + (students.length + 1), // Unique ID
-            name: studentName,
-            course: classInfo.course, // Assign fixed course
-            class: '1A', // Assign to class 1A
-            unit: classInfo.unit, // Assign fixed shift
-            disciplines: [] // Start with no disciplines
-        });
-    });
+            if (savedStudents) {
+                students = JSON.parse(savedStudents);
+                 // Ensure disciplines array exists for old data structure compatibility
+                 students.forEach(student => {
+                     if (!student.disciplines) {
+                         student.disciplines = [];
+                     }
+                 });
+                console.log('Students data loaded from Local Storage.');
+            } else {
+                 // If no saved students, initialize with the predefined list
+                 initializeStudents();
+                 console.log('No students data in Local Storage, initializing with default list.');
+            }
 
-     // Add students from the second list to class 1B
-     newStudentsList1B.forEach((studentName, index) => {
-         const classInfo = getClassInfo('1B');
-         students.push({
-             id: 's' + (students.length + 1), // Unique ID
-             name: studentName,
-             course: classInfo.course, // Assign fixed course
-             class: '1B', // Assign to class 1B
-             unit: classInfo.unit, // Assign fixed shift
-             disciplines: [] // Start with no disciplines
-         });
-     });
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+                 // Ensure disciplines and classes arrays exist for old data structure compatibility
+                 users.forEach(user => {
+                     if (user.role === 'professor') {
+                          if (!user.disciplines) user.disciplines = [];
+                          if (!user.classes) user.classes = [];
+                     }
+                 });
+                console.log('Users data loaded from Local Storage.');
+            } else {
+                 // If no saved users, initialize with the default admin, professor, coordinator
+                 initializeUsers();
+                 console.log('No users data in Local Storage, initializing with default users.');
+            }
 
-     // Add students from the third list to class 1C
-     newStudentsList1C.forEach((studentName, index) => {
-         const classInfo = getClassInfo('1C');
-         students.push({
-             id: 's' + (students.length + 1), // Unique ID
-             name: studentName,
-             course: classInfo.course, // Assign fixed course
-             class: '1C', // Assign to class 1C
-             unit: classInfo.unit, // Assign fixed shift
-             disciplines: [] // Start with no disciplines
-         });
-     });
-
-      // Add students from the fourth list to class 2A
-      newStudentsList2A.forEach((studentName, index) => {
-          const classInfo = getClassInfo('2A');
-          students.push({
-              id: 's' + (students.length + 1), // Unique ID
-              name: studentName,
-              course: classInfo.course, // Assign fixed course
-              class: '2A', // Assign to class 2A
-              unit: classInfo.unit, // Assign fixed shift
-              disciplines: [] // Start with no disciplines
-          });
-      });
-
-      // Add students from the fifth list to class 2B
-      newStudentsList2B.forEach((studentName, index) => {
-          const classInfo = getClassInfo('2B');
-          students.push({
-              id: 's' + (students.length + 1), // Unique ID
-              name: studentName,
-              course: classInfo.course, // Assign fixed course
-              class: '2B', // Assign to class 2B
-              unit: classInfo.unit, // Assign fixed shift
-              disciplines: [] // Start with no disciplines
-          });
-      });
-
-      // Add students from the new list to class 3A
-      newStudentsList3A.forEach((studentName, index) => {
-          const classInfo = getClassInfo('3A');
-          students.push({
-              id: 's' + (students.length + 1), // Unique ID
-              name: studentName,
-              course: classInfo.course, // Assign fixed course
-              class: '3A', // Assign to class 3A
-              unit: classInfo.unit, // Assign fixed shift
-              disciplines: [] // Start with no disciplines
-          });
-      });
+             // After loading or initializing, ensure data is saved if it was just initialized.
+             // This handles the very first run scenario.
+             if (!savedStudents || !savedUsers) {
+                  saveData();
+             }
 
 
-    // Basic user example (replace with Local Storage or Backend)
-    let users = [
-        { username: 'administrador', password: 'admsenac2024', role: 'admin', name: 'Administrador' }, // Admin credentials updated
-        { username: 'profmath', password: 'passprof', role: 'professor', name: 'Prof. Matemática', disciplines: ['Matemática', 'Física'], classes: ['1A', '1B', '1C', '2A', '2B', '3A'] }, // Example professor assignments updated to include 1B, 1C, 2A, 2B, and 3A
-         { username: 'coord', password: 'passcoord', role: 'coordenador', name: 'Coordenador Geral' }, // Plaintext password: INSECURE!
-    ];
+        } catch (e) {
+            console.error('Error loading data from Local Storage:', e);
+            alert('Erro ao carregar dados. Os dados locais podem estar corrompidos ou há um problema de permissão.');
+            // **ACTION TO HANDLE CORRUPTION:** Clear storage and re-initialize
+            localStorage.removeItem('students');
+            localStorage.removeItem('users');
+            console.warn('Cleared corrupted Local Storage data and re-initializing.');
+            initializeStudents(); // Re-initialize students
+            initializeUsers(); // Re-initialize users
+            saveData(); // Save the newly initialized data
+            // After clearing and re-initializing, you might want to alert the user that data was reset
+            alert('Os dados salvos localmente estavam corrompidos e foram redefinidos para o estado inicial. As alterações não salvas foram perdidas.');
+        }
+    }
 
-    let currentUser = null; // Currently logged in user
+     // --- Initialization Functions (called if no data in Local Storage) ---
+    // Initializes the students array with a predefined list.
+    function initializeStudents() {
+         students = []; // Ensure it's empty before adding defaults
+
+         // Add the new students provided by the user
+         const newStudentsList1A = [
+             "Alice Souza Cavalcanti", "Ana Luisa Trajano Fragoso", "Anna Jullia Cabral da Silva",
+             "Davi Fenelon Mendonça da Silva", "Fernando Vinicius Serejo de Melo", "Gabriel Artur Lima da Silva",
+             "Gabriel de Souza Alencar", "Gabriel Vinicius Nazareth de Melo", "Gabrielly Maria da Silva Oliveira",
+             "Giovanna Dias Sales do Nascimento", "Guilherme Barbosa Alcântara", "Guilherme Viana Guedes Nunes",
+             "Heloisa Maria do Carmo Santos", "Henrique Rodrigues Ulisses", "Hivison Yan Pereira de Oliveira",
+             "Ikaro Vinícius Gomes de Abreu", "Isabel Cristina Vital da Silva Nascimento", "Julia Carlos Picchetto",
+             "Leonardo Vasconcelos Santana", "Leticia Xavier da Silva", "Marcos Cavalcanti de Freitas Lima",
+             "Maria Laura Alves da Silva", "Maria Luiza Gomes Felix", "Matheus Josias de França Caitano",
+             "Miguel Bispo de Almeida", "Miguel Rodrigues Souza de Lima", "Milena Maria Andrade de Lima",
+             "Nicolas Gabriel de Oliveira Muniz", "Otávio Xavier de Amorim Fontes", "Pedro Luiz Barbosa Generoso",
+             "Rayner Victor Silva de Rezende Filho", "Richard Lima Nascimento de Melo", "Yasmin de França Medeiros"
+         ];
+
+          const newStudentsList1B = [
+              'Álvaro Martins Moraes', 'Anderson Marcelino dos Santos', 'Anna Luiza Vicente de Castro Lira',
+              'Arthur Brunno dos Santos Silva', 'Arthur Guilherme de Andrade Barros', 'Caylane Maria Rodrigues de Souza',
+              'Clara Beatriz Viana Souza Pinto', 'Davi Cruz Correia Lima', 'Eduardo Bezerra Souto Maior Mendes',
+              'Ellen Vitória Pessoa da Silva', 'Gabriel Araújo de França', 'Guilherme Vinhaes de Matos',
+              'Isabelle Miranda Moreira', 'Israel Ricardo de Araujo Lõbo', 'Izadhora Luíza Dias Pródigo',
+              'Jorge Henrique da Silva', 'Julia Isabella Bezerra de Fraga', 'Júlia Letícia do Nascimento da Silva',
+              'Karen Lorena da Cunha Souza', 'Lucas da Silva Resende', 'Marcelo José Bomfim Neto',
+              'Marcos Yuri Gadelha Araújo', 'Maria Clara Bezerra Reis', 'Maria Eduarda Araújo Nascimento',
+              'Maria Eduarda Rodrigues Barreto', 'Maria Letícia Góes Azevedo', 'Marina Gabriele de Andrade Rego',
+              'Matheus Dias Correia de Assunção', 'Murilo de Lima Rodrigues', 'Pedro Gabriel Farias de Arruda Guedes',
+              'Ruan Zaquel Sena da Silva', 'Samara Maciel Cabral de Melo'
+          ];
+
+          const newStudentsList1C = [
+              'Alice Giulianna dos Santos Alves', 'Arthur Brito Solano Guerra de Oliveira', 'Caua Leonardo Santos Ferreira de Sena',
+              'Cláudio Gusmão Ramos Neto', 'David Romão Gomes dos Passos', 'Emily Larissa Pereira da Silva',
+              'Estefany Guedes Carvalho', 'Evilin Nayara Gomes da Silva', 'Harison Cleyton Fernandes do Nascimento',
+              'Heitor Assunção Monteiro', 'Izaias Elias Chagas Neto', 'Jefferson Luan Silva de Paula',
+              'João Daniel Bernardo de Santana Oliveira', 'João Pedro da SilvaEm Processo', 'Jullia Hadassa Araujo de Oliveira',
+              'Kaike Eduardo Morozini de Bastos', 'Kauã Felipe Oliveira da Silva', 'Larissa Lopes Belo da Silva',
+              'Livia Ferreira Nunes', 'Luís Guilherme Ventura Alves', 'Maria Clara da Silva Clemente',
+              'Maria Eduarda de Brito Rodrigues', 'Maria Eduarda Farias Chaves Lopes', 'Maria Fernanda Oliveira Costa',
+              'Maria Klara Alves Cavalcante', 'Maria Luiza Braz Mendes', 'Mateus Marinho Espíndola',
+              'Nicolas Gabriel Bezerra dos Santos Souza', 'Rianne de Almeida Romao', 'Samuell Moises Pereira da Silva',
+              'Thays Camila da Silva Santos', 'Vinicios Bezerra da Silva', 'Wandersson Alves Cavalcante',
+              'William Alves de Freitas'
+          ];
+
+           const newStudentsList2A = [
+               'Cibele Guerra Medeiros', 'Davi Nascimento Martins', 'Deborah Leão Marques Machado',
+               'Erick Cauã Ferreira Rodrigues Figueredo', 'Gabriel Elias Rangel', 'Gleiciane Júlia Vieira do Nascimento',
+               'Ivan Freire de Araújo Neto', 'Joao Henrique Oliveira Gonçalves', 'Joao Vitor Sousa Ramos',
+               'Juan Gomes Rodrigues', 'Leticia de Santana Lins', 'Letícia Maria Augusto de Souza Galvão',
+               'Luckas Alexandre Oliveira Castro Barros', 'Luna Ariela Carvalho de Deus', 'Matheus de Andrade Cordeiro Malafaia Gomes',
+               'Matheus Henrique Ferreira da Silva', 'Maxwell Bernardo Eulálio Pereira Cavalcante', 'Pedro Vinicius de Souza Cavalcanti',
+               'Pietro Cauê da Silva Santos', 'Renato Alves Ribeiro de Oliveira', 'Suzanny Moura de Barros',
+               'Talles Renan Melo de Souza Lira', 'Thayná Valença Albuquerque', 'Victor Gabriel Pereira de Lima',
+               'Vinicius Novaes Silva'
+           ];
+
+           const newStudentsList2B = [
+               'Adricia Naine Costa Bandeira Ferreira', 'Airton Samuel Rodrigues Costa', 'Bruno Rafael Silva Costa',
+               'Caio Cesar Silva Melo', 'Caio Muller Silva da Rocha', 'Daniel Henrique José dos Santos',
+               'Davi Felix MarinhoEm', 'Diógenes Luiz Freitas Batista', 'Eduardo Passos de Andrade',
+               'Gabriela Lima Alexandrino', 'Geovana Noemi Ferreira Moura', 'Guilherme José Rodrigues de Freitas',
+               'Ingrid Cristina Rodrigues Ventura de Araújo', 'João Henrique Santana Cunha', 'Layza Cristina Melo Santos',
+               'Ligia Vitoria Linhares do Nascimento', 'Lucas Miguel Barbosa da Silva', 'Luiz Henrique dos Santos',
+               'Marcos Vasconcelos Dencker Beltrão', 'Maria Carolina Franco de Lima Leite', 'Maria Manuela Helena da Silva',
+               'Matheus Vínicius Aguiar da Silva', 'Pedro Henrique Moura Nascimento da Silva', 'Pedro Henrique Ribeiro de Assumpção',
+               'Pedro Ivo Ribeiro da Cunha', 'Pedro Vinicius Barbosa de Oliveira', 'Sidney Sabino de Lima Junior'
+           ];
+
+           const newStudentsList3A = [ // New list for 3A
+              'Alliny Santos de Albuquerque', 'Anna Bianca de Moraes Almeida Castro', 'Arthur Emmanuel França Aquino de Medeiros',
+              'Carlos Eduardo Bezerra de Santana', 'Clarice Araújo Soares Couto', 'Emily Cristiane Mesquita de Almeida',
+              'Filipe Emanuel Lins do Nascimento Silva', 'Guilherme Tomaz Paiva de Aquino', 'Iury Gabriel Barreto',
+              'Lara Lins de Oliveira', 'Leandro Henrique Carvalho Correia', 'Leticia Chaprão Aureliano de Souza',
+              'Leticia Ellen Ximenes', 'Letícia Marques de Lima Campos', 'Lucas Bandeira de Melo Torres Sena',
+              'Marcello Henrique da Silva Barros', 'Maria Clara Oliveira Sarinho de Melo', 'Maria Eduarda Soares de Albuquerque',
+              'Maria Livia Costa de Oliveira Silva', 'Marina Rodrigues de Lima', 'Mateus Araujo de Oliveira Santos',
+              'Samara Marinho Pereira Roberto', 'Victor Antonio Santana de Lima', 'Yasmin Lopes Mendes'
+          ];
+
+
+         // Mapping classes to fixed shifts AND courses
+         const classInfoMap = {
+             '1A': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
+             '1B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Jogos' },
+             '1C': { unit: 'Tarde', course: 'Médio Técnico Desenvolvimento de Sistemas' },
+             '2A': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
+             '2B': { unit: 'Manhã', course: 'Médio Técnico Desenvolvimento de Sistemas' },
+             '3A': { unit: 'Tarde', course: 'Médio Técnico Informática' }
+         };
+
+         // Function to get class info (shift and course) based on class name
+         function getClassInfo(className) {
+             return classInfoMap[className] || { unit: 'Desconhecido', course: 'Desconhecido' }; // Default if class not mapped
+         }
+
+         // Helper to add students from a list to a specific class
+         function addStudentsToList(studentNames, className) {
+              const classInfo = getClassInfo(className);
+              studentNames.forEach((studentName, index) => { // Add index for potential unique ID logic if needed
+                  // Generate a more robust unique ID if possible, perhaps based on name + a counter or timestamp
+                  // For this demo, just using array length + 1 as before.
+                  const newStudentId = 's' + Date.now() + Math.random().toString(36).substring(2, 15); // More unique ID
+                  students.push({
+                      id: newStudentId,
+                      name: studentName,
+                      course: classInfo.course,
+                      class: className,
+                      unit: classInfo.unit,
+                      disciplines: []
+                  });
+              });
+         }
+
+         addStudentsToList(newStudentsList1A, '1A');
+         addStudentsToList(newStudentsList1B, '1B');
+         addStudentsToList(newStudentsList1C, '1C');
+         addStudentsToList(newStudentsList2A, '2A');
+         addStudentsToList(newStudentsList2B, '2B');
+         addStudentsToList(newStudentsList3A, '3A');
+
+    }
+
+    // Initializes the users array with default admin, professor, and coordinator users.
+    function initializeUsers() {
+        users = [
+            { username: 'administrador', password: 'admsenac2024', role: 'admin', name: 'Administrador' },
+            { username: 'profmath', password: 'passprof', role: 'professor', name: 'Prof. Matemática', disciplines: ['Matemática', 'Física'], classes: ['1A', '1B', '1C', '2A', '2B', '3A'] },
+             { username: 'coord', password: 'passcoord', role: 'coordenador', name: 'Coordenador Geral' },
+        ];
+    }
+
 
     // --- Basic Section Display Functions ---
     const loginContainer = document.getElementById('loginContainer');
@@ -1187,6 +1210,8 @@
 
     // Check if already logged in on page load
      window.addEventListener('load', function() {
+         loadData(); // Load data from Local Storage on page load
+
          // In a real application, you would check for a valid session token here
          // Using Local Storage for a simple example (INSEGURO for sensitive data)
          const savedUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -1634,13 +1659,8 @@
                 student.disciplines.push(disciplineEntry); // Add the new entry
             }
 
-
             // Update the value in the simulated data array
             disciplineEntry[field] = newValue;
-             // ATENÇÃO: Em um sistema real, você salvaria isso no Local Storage ou backend aqui!
-
-             // Optional: Recalculate situation after saving grades (requires logic)
-             // disciplineEntry.situation = calculateSituation(disciplineEntry.eval1, disciplineEntry.eval2, disciplineEntry.finalGrade);
 
              // Update the cell display with the new value (using span again)
              let displayValue = newValue || '';
@@ -1657,6 +1677,8 @@
              // If in the professor table, you might want to re-render just this row or the whole table
              // to reflect the updated situation (if situation logic is complex)
              // This basic implementation assumes situation is static or calculated elsewhere for now.
+            saveData(); // Save data after updating a discipline entry
+
 
         } else {
             // Student not found (shouldn't happen if data- attributes are correct)
@@ -1748,8 +1770,8 @@
             return;
         }
 
-        // Gera um ID simples (para demonstração)
-        const newStudentId = 's' + (students.length + 1);
+        // Gera um ID simples (para demonstração) - Consider using a more unique ID generator in a real app.
+        const newStudentId = 's' + Date.now() + Math.random().toString(36).substring(2, 15); // More unique ID
 
         const newStudent = {
             id: newStudentId,
@@ -1763,7 +1785,7 @@
 
         students.push(newStudent);
 
-        // ATENÇÃO: Em um sistema real, você salvaria 'students' no Local Storage ou backend aqui!
+        saveData(); // Save data after adding a student
 
         // Limpa o formulário
         studentNameInput.value = '';
@@ -1853,7 +1875,7 @@
 
             student.disciplines.push(newDiscipline);
 
-            // ATENÇÃO: Em um sistema real, você salvaria 'students' no Local Storage ou backend aqui!
+            saveData(); // Save data after adding a discipline
 
             // Limpa o formulário (reset class and student selects)
             disciplineClassSelect.value = '';
@@ -1874,7 +1896,7 @@
 
              // Se o aluno correspondente estiver logado, atualiza o boletim dele na tela
              if (currentUser && currentUser.role === 'aluno' && currentUser.studentId === student.id) {
-                  showStudentBulletin(); // Recarrega o boletim do aluno logado
+                 showStudentBulletin(); // Recarrega o boletim do aluno logado
              }
 
 
@@ -2208,7 +2230,7 @@
 
          users.push(newProfessor);
 
-         // ATENÇÃO: Em um sistema real, você salvaria 'users' no Local Storage ou backend aqui!
+         saveData(); // Save data after adding a professor
 
          closeAddProfessorModal(); // Close the modal and clear form
          renderUsersTable(users); // Update the user management table
@@ -2260,7 +2282,7 @@
 
          users.push(newCoordinator);
 
-         // ATENÇÃO: Em um sistema real, você salvaria 'users' no Local Storage ou backend aqui!
+         saveData(); // Save data after adding a coordinator
 
          closeAddCoordenadorModal(); // Close the modal and clear form
          renderUsersTable(users); // Update the user management table
@@ -2371,11 +2393,12 @@
               const student = students.find(s => s.id === users[userIndex].studentId);
               if (student) {
                   student.name = newName; // Update the student's name
+                   // Optional: Update student's username/matricula if it's linked and allowed
+                   // student.matricula = newUsername; // If student object has matricula
               }
           }
 
-
-         // ATENÇÃO: Em um sistema real, você salvaria 'users' no Local Storage ou backend aqui!
+         saveData(); // Save data after updating a user
 
          closeEditUserModal(); // Close the modal
          renderUsersTable(users); // Update the user management table
@@ -2433,7 +2456,8 @@
              users = users.filter(user => user.username !== username);
 
              if (users.length < initialUserCount) {
-                 // ATENÇÃO: Em um sistema real, você salvaria 'users' e 'students' no Local Storage ou backend aqui!
+                 saveData(); // Save data after deleting a user
+
                  renderUsersTable(users); // Update the user management table
                  renderStudentTable(students); // Re-render student table after potential student deletion
                  alert('Usuário excluído com sucesso.');
@@ -2501,7 +2525,8 @@
              // Remove the discipline entry from the student's disciplines array
              student.disciplines.splice(disciplineIndex, 1);
 
-             // ATENÇÃO: Em um sistema real, você salvaria 'students' no Local Storage ou backend aqui!
+             saveData(); // Save data after deleting a discipline entry
+
 
              // Re-render the student table to reflect the change
              renderStudentTable(students);
@@ -2659,7 +2684,7 @@
                 div.appendChild(checkbox);
                 div.appendChild(label);
                 container.appendChild(div);
-            });
+           });
        }
         // Call these functions when opening the edit user modal, passing the user's current assignments
         // Example: editUser(username) { ... populateEditProfessorDisciplineCheckboxes(user.disciplines); populateEditProfessorClassCheckboxes(user.classes); ... }
@@ -2753,7 +2778,7 @@
 
         users.push(newAlunoUser); // Adicionar o novo usuário à lista de usuários
 
-        // ATENÇÃO: Em um sistema real, você salvaria 'users' (e a atualização em 'students' se adicionou matrícula) no Local Storage ou backend aqui!
+        saveData(); // Save data after adding an aluno user
 
         // Limpa e fecha o modal
         closeAddAlunoUserModal();

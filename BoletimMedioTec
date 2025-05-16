@@ -526,7 +526,8 @@
 <h3>Gerenciar Usuários</h3>
 <button class="button" onclick="showAddProfessorForm()" type="button">Adicionar Professor</button>
 <button class="button" onclick="showAddCoordenadorForm()" type="button">Adicionar Coordenador</button>
-<button class="button" onclick="showManageUsersSection()" type="button">Gerenciar Professores/Coordenadores</button><button class="button" onclick="showAddAlunoUserForm()" type="button">Adicionar Usuário de Aluno</button>
+<button class="button" onclick="showAddAlunoUserForm()" type="button">Adicionar Usuário de Aluno</button>
+<button class="button" onclick="showManageUsersSection()" type="button">Gerenciar Usuários</button>
 </div>
 <hr class="hidden" id="sidebarHr"/>
 <button class="button logout-button" onclick="logout()" type="button">Sair</button>
@@ -688,7 +689,7 @@
 </tbody>
 </table>
 </div>
-<div class="hidden" id="manageUsersSection"> <h1>Gerenciar Professores e Coordenadores</h1>
+<div class="hidden" id="manageUsersSection"> <h1>Gerenciar Usuários</h1>
 <button class="button" onclick="showStudentManagementSection()" style="width:auto; margin-bottom: 20px;" type="button">Voltar para Gerenciar Alunos</button>
 <p class="security-warning">AVISO DE SEGURANÇA: As senhas estão visíveis nesta tela apenas para demonstração. Em um sistema real, senhas nunca devem ser exibidas ou armazenadas em texto plano.</p>
 <p id="noUsersMessage">Nenhum usuário (Professor ou Coordenador) cadastrado além do administrador principal.</p>
@@ -1430,7 +1431,6 @@
               situationCell.dataset.options = ',"Aprovado","Reprovado","Pendente"'; // Options for select
              situationCell.innerHTML = `<span>${disciplineData ? (disciplineData.situation || '') : ''}</span>`; // Use empty if null/undefined
 
-
              // Editable cell for Observations
              const observationCell = row.insertCell();
              observationCell.classList.add('editable-cell');
@@ -1454,8 +1454,7 @@
          const noUsersMessage = document.getElementById('noUsersMessage');
 
          // Filter out the main admin from the list for display in this table
-         // Keep 'aluno' users if they are part of the 'users' array and we want to list them here
-         const displayUsers = usersToRender.filter(user => user.username !== 'administrador'); // Updated admin username check
+         const displayUsers = usersToRender.filter(user => user.username !== 'administrador');
 
          if (!displayUsers || displayUsers.length === 0) {
              noUsersMessage.classList.remove('hidden');
@@ -1463,7 +1462,7 @@
               document.getElementById('usersTable').classList.add('hidden');
 
          } else {
-             noUsersMessage.classList.remove('hidden');
+             noUsersMessage.classList.add('hidden'); // Hide the "no users" message if there are users to display
               document.getElementById('usersTable').classList.remove('hidden');
 
              displayUsers.forEach(user => {
@@ -1485,14 +1484,14 @@
                  row.insertCell().textContent = user.password; // Insecure demonstration
 
                  const actionsCell = row.insertCell();
-                  // Only show edit/delete for professor/coordenador, not admin or aluno (for simplicity)
-                  if (user.role === 'professor' || user.role === 'coordenador') {
+                  // Show edit/delete for professor, coordenador, and aluno users
+                  if (user.role !== 'admin') { // Admin cannot be edited/deleted via this table
                       actionsCell.innerHTML = `
                           <button type="button" class="button" onclick="editUser('${user.username}')">Editar</button>
                           <button type="button" class="button delete-button" onclick="deleteUser('${user.username}')">Excluir</button>
                       `;
                   } else {
-                       actionsCell.textContent = '-'; // No actions for aluno users in this table
+                       actionsCell.textContent = '-'; // No actions for the main admin user
                   }
              });
          }
@@ -2284,6 +2283,12 @@
              return;
          }
 
+         // Prevent editing the main admin user via this modal
+         if (user.username === 'administrador') {
+             alert('Não é possível editar o usuário administrador principal por aqui.');
+             return;
+         }
+
 
          // Populate the modal fields
          document.getElementById('editUserModalTitle').textContent = `Editar Usuário: ${user.name}`;
@@ -2317,6 +2322,7 @@
          document.getElementById('editUserPasswordInput').value = '';
          document.querySelectorAll('#editProfessorDisciplinesCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
          document.querySelectorAll('#editProfessorClassesCheckboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+         document.getElementById('editProfessorAssignments').classList.add('hidden'); // Hide assignments by default
      }
 
      function updateUser() {
@@ -2360,12 +2366,20 @@
              users[userIndex].disciplines = Array.from(disciplineCheckboxes).map(cb => cb.value);
              users[userIndex].classes = Array.from(classCheckboxes).map(cb => cb.value);
          }
+          // If the user is an 'aluno', update the corresponding student's name as well
+          if (userRole === 'aluno' && users[userIndex].studentId) {
+              const student = students.find(s => s.id === users[userIndex].studentId);
+              if (student) {
+                  student.name = newName; // Update the student's name
+              }
+          }
 
 
          // ATENÇÃO: Em um sistema real, você salvaria 'users' no Local Storage ou backend aqui!
 
          closeEditUserModal(); // Close the modal
          renderUsersTable(users); // Update the user management table
+         renderStudentTable(students); // Re-render student table to reflect name changes
 
          // If the currently logged-in user changed their username, they might need to log in again
          // For this demo, we'll just update the currentUser object in memory if it matches
@@ -2395,25 +2409,37 @@
               return;
           }
 
-         // Also prevent deleting aluno users via this general delete function for simplicity in demo
          const userToDelete = users.find(user => user.username === username);
-         if (userToDelete && userToDelete.role === 'aluno') {
-             alert('Não é possível excluir usuários de aluno por aqui.'); // Or implement a specific deleteAlunoUser function
-             return;
+
+         if (!userToDelete) {
+              alert('Erro ao excluir usuário: Usuário não encontrado.');
+              return;
          }
 
-
          if (confirm(`Tem certeza que deseja excluir o usuário "${username}"? Esta ação não pode ser desfeita."`)) {
-             // Filter out the user to be deleted
+             // If the user to delete is an 'aluno', remove the corresponding student as well
+             if (userToDelete.role === 'aluno' && userToDelete.studentId) {
+                 const studentIndex = students.findIndex(s => s.id === userToDelete.studentId);
+                 if (studentIndex !== -1) {
+                     students.splice(studentIndex, 1); // Remove the student
+                      // Note: This also implicitly removes their disciplines from the students array structure
+                 } else {
+                     console.warn('Corresponding student not found for user deletion:', userToDelete);
+                 }
+             }
+
+             // Filter out the user to be deleted from the users array
              const initialUserCount = users.length;
              users = users.filter(user => user.username !== username);
 
              if (users.length < initialUserCount) {
-                 // ATENÇÃO: Em um sistema real, você salvaria 'users' no Local Storage ou backend aqui!
+                 // ATENÇÃO: Em um sistema real, você salvaria 'users' e 'students' no Local Storage ou backend aqui!
                  renderUsersTable(users); // Update the user management table
+                 renderStudentTable(students); // Re-render student table after potential student deletion
                  alert('Usuário excluído com sucesso.');
              } else {
-                 alert('Erro ao excluir usuário: Usuário não encontrado.');
+                 // This case should ideally not be reached if userToDelete was found
+                 alert('Erro inesperado ao excluir usuário.');
              }
          }
      }
